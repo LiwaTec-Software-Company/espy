@@ -13,14 +13,15 @@ struct SheetView: View {
 
   
   var body: some View {
-    VStack(spacing: 50) {
+    VStack(alignment: .center, spacing: 4.0, content: {
       TextEditor(text: $fullText)
       Button(action: {
         presentationMode.wrappedValue.dismiss()
       }, label: {
-        Label("Close", systemImage: "xmark.circle")
+        Image(systemName: "chevron.compact.down")
+          .font(.system(size: 44.0, weight: .bold))
       })
-    }
+    })
   }
 }
 
