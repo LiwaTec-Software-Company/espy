@@ -66,14 +66,19 @@ struct ContentView: View {
             Image(systemName: "gearshape")
           }
           Spacer()
-          Button(action: {
-            showingSheet.toggle()
-          }) {
-            Image(systemName: "arrowtriangle.up.fill")
+          HStack {
+            Button(action: {
+              showingSheet.toggle()
+            }) {
+              Image(systemName: "chevron.compact.up")
+                .font(.system(size: 44.0, weight: .bold))
+            }
+            .sheet(isPresented: $showingSheet) {
+              SheetView()
+            }
+            Text("")
           }
-          .sheet(isPresented: $showingSheet) {
-            SheetView()
-          }
+
           Spacer()
           Button(action: {
             print("Edit button was tapped")
