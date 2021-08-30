@@ -9,12 +9,12 @@ import SwiftUI
 
 struct SheetView: View {
   @Environment(\.presentationMode) var presentationMode
+  @State private var fullText = "Mhm..."
+
   
   var body: some View {
     VStack(spacing: 50) {
-      Text("Information view.")
-        .font(.largeTitle)
-      
+      TextEditor(text: $fullText)
       Button(action: {
         presentationMode.wrappedValue.dismiss()
       }, label: {
@@ -25,7 +25,7 @@ struct SheetView: View {
 }
 
 struct ContentView: View {
-  @State private var showingSheet = false
+  @State private var showingSheet = true
   
   var body: some View {
     NavigationView {
