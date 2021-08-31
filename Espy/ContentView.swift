@@ -11,20 +11,37 @@ struct EditView: View {
   @Environment(\.presentationMode) var presentationMode
   @EnvironmentObject var cloudManager: CloudManager
 
-  @State var entry: Entry
   @State var fullText: String = ""
+
+  var selectedIndex: Int = 0
+  var selectedEntry: Entry = Entry()
+  var subheadlineText = ""
+
+  var isNew = true
+
+  init() {}
+
+  init(index: Int, cloudManager: CloudManager, isNew: Bool = false) {
+    self.selectedIndex = index
+    self.selectedEntry = cloudManager.entries[selectedIndex]
+
+    self.isNew = isNew
+    _fullText = State(initialValue: selectedEntry.content)
+  }
 
   var body: some View {
     VStack(alignment: .center, spacing: 4.0, content: {
-      Text(entry.date.displayDate()).padding(/*@START_MENU_TOKEN@*/10/*@END_MENU_TOKEN@*/).font(.title3).foregroundColor(.blue)
-      Text(entry.id.uuidString).padding(/*@START_MENU_TOKEN@*/10/*@END_MENU_TOKEN@*/).font(.subheadline)
+      Text(selectedEntry.date.displayDate()).padding(/*@START_MENU_TOKEN@*/10/*@END_MENU_TOKEN@*/).font(.title3).foregroundColor(.white)
+      Text(selectedEntry.id.uuidString).padding(/*@START_MENU_TOKEN@*/10/*@END_MENU_TOKEN@*/).font(.subheadline).foregroundColor(isNew ? .green : .blue)
       TextEditor(text: $fullText).padding(/*@START_MENU_TOKEN@*/10/*@END_MENU_TOKEN@*/)
       Button(action: {
-        let date = Date()
-        entry.content = fullText
-        entry.lastUpdated = date
+        let entry = Entry(entry: selectedEntry, content: fullText)
 
-        cloudManager.updateEntry(entry)
+        if isNew {
+          cloudManager.addNewEntry(entry)
+        } else {
+          cloudManager.updateEntry(entry, at: selectedIndex)
+        }
 
         presentationMode.wrappedValue.dismiss()
       }, label: {
@@ -37,22 +54,23 @@ struct EditView: View {
 
 struct ContentView: View {
   @StateObject var cloudManager = CloudManager()
-  @State private var showingSheet = true
+  @State private var isShowingEntrySheet = false
+  @State private var isShowingBottomSheet = true
 
   var body: some View {
     NavigationView {
       List {
-        ForEach(cloudManager.entries) { (entry: Entry) in
+        ForEachWithIndex(cloudManager.entries) { (index: Int, entry: Entry) in
           Button(action: {
-            showingSheet.toggle()
+            isShowingEntrySheet.toggle()
           }) {
             VStack(alignment: .leading, spacing: 2) {
               Text(entry.date.shortString()).font(.subheadline).foregroundColor(.blue)
               Text(entry.content)
             }
           }
-          .sheet(isPresented: $showingSheet) {
-            EditView(entry: entry, fullText: entry.content)
+          .sheet(isPresented: $isShowingEntrySheet) {
+            EditView(index: index, cloudManager: cloudManager)
           }
         }.onDelete(perform: delete)
       }
@@ -71,13 +89,13 @@ struct ContentView: View {
           Spacer()
           HStack {
             Button(action: {
-              showingSheet.toggle()
+              isShowingBottomSheet.toggle()
             }) {
               Image(systemName: "chevron.compact.up")
                 .font(.system(size: 44.0, weight: .bold))
             }
-            .sheet(isPresented: $showingSheet) {
-              EditView(entry: Entry())
+            .sheet(isPresented: $isShowingBottomSheet) {
+              EditView()
             }
             Text("")
           }

@@ -13,6 +13,10 @@ import Foundation
 class CloudManager: ObservableObject {
   @Published var entries = [Entry]()
 
+  init() {
+    updateData()
+  }
+
   struct DocumentsDirectory {
     static let localDocumentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
     static let iCloudDocumentsURL = FileManager.default.url(forUbiquityContainerIdentifier: nil)?.appendingPathComponent("Documents")
@@ -128,14 +132,14 @@ extension CloudManager {
     entries.append(entry)
   }
 
-  func updateEntry(_ entry: Entry) {
+  func updateEntry(_ entry: Entry, at index: Int) {
     let entryFile = getDocumentDiretoryURL().appendingPathComponent("\(entry.formattedStringDate).md")
     if doesFileExist(entryFile) {
       deleteFile(url: entryFile)
-      deleteEntries(ids: [entry.id])
+      entries[index] = entry
+    } else {
+      addNewEntry(entry)
     }
-
-    addNewEntry(entry)
   }
 
   private func getEntries() -> [Entry] {
@@ -148,18 +152,17 @@ extension CloudManager {
         if !file.lastPathComponent.contains(".md") { continue }
         do {
           let content = try String(contentsOf: file, encoding: .utf8)
-          let lines = content.components(separatedBy: .newlines)
-          guard let lastLine = lines.last else {
+          var lines = content.components(separatedBy: .newlines)
+
+          let _ = print(lines)
+
+          guard let lastLine = lines.last, let entryId = UUID(uuidString: lastLine) else {
             entries.append(Entry(date: "\(fileNames[index])", content: content))
             continue
           }
-
-          guard let entryId = UUID(uuidString: lastLine) else {
-            entries.append(Entry(date: "\(fileNames[index])", content: content))
-            continue
-          }
-
-          let entry = Entry(id: entryId, date: "\(fileNames[index])", content: content)
+          lines.removeLast()
+          let entryContent = lines.joined()
+          let entry = Entry(id: entryId, date: "\(fileNames[index])", content: entryContent)
           entries.append(entry)
         } catch {
           print("Cant open this particulate file :/", file)

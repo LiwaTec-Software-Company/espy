@@ -10,16 +10,16 @@ import Foundation
 
 struct Entry: Identifiable {
   /// Unique id of the entry which is basically the date down to seconds.
-  var id: UUID = UUID()
+  var id: UUID
   /// The date the entry was entered.
-  var date: Date = Date()
+  var date: Date
   /// Date this entry was updated by the user.
-  var lastUpdated: Date = Date()
+  var lastUpdated: Date
   /// The text that was entered by the user.
-  var content: String = ""
+  var content: String
   var inSaveFormat: String {
     get {
-      return content + "\n\n" + id.uuidString
+      return content + "\n" + id.uuidString
     }
   }
   /// The date formatted for use in app.
@@ -28,7 +28,10 @@ struct Entry: Identifiable {
   }
 
   init() {
-    
+    self.id = UUID()
+    self.date = Date()
+    self.lastUpdated = self.date
+    self.content = ""
   }
 
   init(id: UUID, date: Date, content: String) {
@@ -46,20 +49,23 @@ struct Entry: Identifiable {
   }
 
   init(date: Date, content: String) {
+    self.id = UUID()
     self.date = date
     self.lastUpdated = date
     self.content = content
   }
 
   init(date: String, content: String) {
+    self.id = UUID()
     self.date = Date().formattedDateFrom(date) ?? Date()
     self.lastUpdated = self.date
     self.content = content
   }
 
   init(entry: Entry, content: String) {
+    self.id = entry.id
     self.date = entry.date
-    self.lastUpdated = entry.lastUpdated
+    self.lastUpdated = Date()
     self.content = content
   }
 }
