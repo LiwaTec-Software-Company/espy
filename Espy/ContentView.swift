@@ -7,14 +7,15 @@
 
 import SwiftUI
 
-struct SheetView: View {
+struct EditView: View {
   @Environment(\.presentationMode) var presentationMode
+  
   @State private var fullText = "Mhm..."
 
-  
   var body: some View {
     VStack(alignment: .center, spacing: 4.0, content: {
-      TextEditor(text: $fullText)
+      Text(Date().displayDate()).padding(/*@START_MENU_TOKEN@*/10/*@END_MENU_TOKEN@*/).font(.title3).foregroundColor(.blue)
+      TextEditor(text: $fullText).padding(/*@START_MENU_TOKEN@*/10/*@END_MENU_TOKEN@*/)
       Button(action: {
         presentationMode.wrappedValue.dismiss()
       }, label: {
@@ -27,29 +28,25 @@ struct SheetView: View {
 
 struct ContentView: View {
   @State private var showingSheet = true
+
+  let entries: [String] = ["I like pie", "Not today buddy", "Sometimes I like cakes too"]
   
   var body: some View {
     NavigationView {
       List {
-        Button("Show Sheet") {
-          showingSheet.toggle()
-        }
-        .sheet(isPresented: $showingSheet) {
-          SheetView()
-        }
-
-        Button("Show Sheet") {
-          showingSheet.toggle()
-        }
-        .sheet(isPresented: $showingSheet) {
-          SheetView()
-        }
-
-        Button("Show Sheet") {
-          showingSheet.toggle()
-        }
-        .sheet(isPresented: $showingSheet) {
-          SheetView()
+        ForEach(entries, id: \.self) { entry in
+          Button(action: {
+            showingSheet.toggle()
+          }) {
+            VStack(alignment: .leading, spacing: 2) {
+              Text(Date().shortString()).font(.subheadline).foregroundColor(.blue)
+              Text(entry)
+              Text("Some detail goes herer.")
+            }
+          }
+          .sheet(isPresented: $showingSheet) {
+            EditView()
+          }
         }
       }.toolbar {
         ToolbarItem(placement: .bottomBar) {
@@ -58,7 +55,7 @@ struct ContentView: View {
           }
         }
       }.padding()
-      .navigationTitle("Espy")
+      .navigationTitle("Board")
       .toolbar {
         ToolbarItemGroup(placement: .bottomBar) {
           Button(action: {
@@ -75,7 +72,7 @@ struct ContentView: View {
                 .font(.system(size: 44.0, weight: .bold))
             }
             .sheet(isPresented: $showingSheet) {
-              SheetView()
+              EditView()
             }
             Text("")
           }
