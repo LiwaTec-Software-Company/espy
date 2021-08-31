@@ -10,8 +10,8 @@ import Foundation
 
 
 
-class CloudManager {
-  static let instance = CloudManager()
+class CloudManager: ObservableObject {
+  @Published var entries = [Entry]()
 
   struct DocumentsDirectory {
     static let localDocumentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
@@ -111,31 +111,34 @@ class CloudManager {
 
 // MARK - Entry
 extension CloudManager {
+  public func updateData() {
+    entries = getEntries()
+  }
+
   func addNewEntry(_ entry: Entry) {
     let fileURL = getDocumentDiretoryURL().appendingPathComponent("\(entry.formattedStringDate).md")
 
     do {
-      try entry.content.write(to: fileURL, atomically: true, encoding: .utf8)
+      try entry.inSaveFormat.write(to: fileURL, atomically: true, encoding: .utf8)
     }
     catch {
       print("Unable to add this entry.")
     }
+
+    entries.append(entry)
   }
 
   func updateEntry(_ entry: Entry) {
     let entryFile = getDocumentDiretoryURL().appendingPathComponent("\(entry.formattedStringDate).md")
     if doesFileExist(entryFile) {
       deleteFile(url: entryFile)
+      deleteEntries(ids: [entry.id])
     }
-    do {
-      try entry.content.write(to: entryFile, atomically: true, encoding: .utf8)
-    }
-    catch {
-      print("Unable to update this entry.")
-    }
+
+    addNewEntry(entry)
   }
 
-  func getEntries() -> [Entry] {
+  private func getEntries() -> [Entry] {
     var entries = [Entry]()
     do {
       let files = try FileManager.default.contentsOfDirectory(at: getDocumentDiretoryURL(), includingPropertiesForKeys: nil)
@@ -145,8 +148,18 @@ extension CloudManager {
         if !file.lastPathComponent.contains(".md") { continue }
         do {
           let content = try String(contentsOf: file, encoding: .utf8)
+          let lines = content.components(separatedBy: .newlines)
+          guard let lastLine = lines.last else {
+            entries.append(Entry(date: "\(fileNames[index])", content: content))
+            continue
+          }
 
-          let entry = Entry(date: "\(fileNames[index])", content: content)
+          guard let entryId = UUID(uuidString: lastLine) else {
+            entries.append(Entry(date: "\(fileNames[index])", content: content))
+            continue
+          }
+
+          let entry = Entry(id: entryId, date: "\(fileNames[index])", content: content)
           entries.append(entry)
         } catch {
           print("Cant open this particulate file :/", file)
@@ -161,5 +174,17 @@ extension CloudManager {
   func deleteEntry(_ entry: Entry) {
     let fileURL = getDocumentDiretoryURL().appendingPathComponent("\(entry.formattedStringDate).md")
     deleteFile(url: fileURL)
+  }
+
+  func deleteEntries(ids: [UUID]) {
+    // schedule remote delete for selected ids
+    _ = ids.compactMap { id in
+      entries.removeAll {
+        if $0.id == id {
+          deleteEntry($0)
+        }
+        return $0.id == id
+      }
+    }
   }
 }

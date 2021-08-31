@@ -16,7 +16,7 @@
 		3DE853A426DD6DD000D5E146 /* CloudManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DE853A126DD6DCD00D5E146 /* CloudManager.swift */; };
 		3DE853A526DD6DD000D5E146 /* Style.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DE853A326DD6DCF00D5E146 /* Style.swift */; };
 		3DE853A926DD710700D5E146 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DE853A726DD710700D5E146 /* User.swift */; };
-		3DE853AA26DD710700D5E146 /* EntryCodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DE853A826DD710700D5E146 /* EntryCodable.swift */; };
+		3DE853AA26DD710700D5E146 /* Entry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DE853A826DD710700D5E146 /* Entry.swift */; };
 		3DE853AD26DD714200D5E146 /* Date+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DE853AB26DD714200D5E146 /* Date+Extensions.swift */; };
 		3DE853AE26DD714200D5E146 /* TimeInterval+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DE853AC26DD714200D5E146 /* TimeInterval+Extensions.swift */; };
 /* End PBXBuildFile section */
@@ -54,7 +54,7 @@
 		3DE853A126DD6DCD00D5E146 /* CloudManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CloudManager.swift; sourceTree = "<group>"; };
 		3DE853A326DD6DCF00D5E146 /* Style.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Style.swift; sourceTree = "<group>"; };
 		3DE853A726DD710700D5E146 /* User.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
-		3DE853A826DD710700D5E146 /* EntryCodable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EntryCodable.swift; sourceTree = "<group>"; };
+		3DE853A826DD710700D5E146 /* Entry.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Entry.swift; sourceTree = "<group>"; };
 		3DE853AB26DD714200D5E146 /* Date+Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Date+Extensions.swift"; sourceTree = "<group>"; };
 		3DE853AC26DD714200D5E146 /* TimeInterval+Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "TimeInterval+Extensions.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -167,7 +167,7 @@
 			isa = PBXGroup;
 			children = (
 				3DE853A726DD710700D5E146 /* User.swift */,
-				3DE853A826DD710700D5E146 /* EntryCodable.swift */,
+				3DE853A826DD710700D5E146 /* Entry.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -307,7 +307,7 @@
 				3DE8537626DC774400D5E146 /* EspyApp.swift in Sources */,
 				3DE853A926DD710700D5E146 /* User.swift in Sources */,
 				3DE853A526DD6DD000D5E146 /* Style.swift in Sources */,
-				3DE853AA26DD710700D5E146 /* EntryCodable.swift in Sources */,
+				3DE853AA26DD710700D5E146 /* Entry.swift in Sources */,
 				3DE853AE26DD714200D5E146 /* TimeInterval+Extensions.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

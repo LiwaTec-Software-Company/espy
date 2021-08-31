@@ -9,14 +9,23 @@ import SwiftUI
 
 struct EditView: View {
   @Environment(\.presentationMode) var presentationMode
-  
-  @State private var fullText = "Mhm..."
+  @EnvironmentObject var cloudManager: CloudManager
+
+  @State var entry: Entry
+  @State var fullText: String = ""
 
   var body: some View {
     VStack(alignment: .center, spacing: 4.0, content: {
-      Text(Date().displayDate()).padding(/*@START_MENU_TOKEN@*/10/*@END_MENU_TOKEN@*/).font(.title3).foregroundColor(.blue)
+      Text(entry.date.displayDate()).padding(/*@START_MENU_TOKEN@*/10/*@END_MENU_TOKEN@*/).font(.title3).foregroundColor(.blue)
+      Text(entry.id.uuidString).padding(/*@START_MENU_TOKEN@*/10/*@END_MENU_TOKEN@*/).font(.subheadline)
       TextEditor(text: $fullText).padding(/*@START_MENU_TOKEN@*/10/*@END_MENU_TOKEN@*/)
       Button(action: {
+        let date = Date()
+        entry.content = fullText
+        entry.lastUpdated = date
+
+        cloudManager.updateEntry(entry)
+
         presentationMode.wrappedValue.dismiss()
       }, label: {
         Image(systemName: "chevron.compact.down")
@@ -27,34 +36,30 @@ struct EditView: View {
 }
 
 struct ContentView: View {
+  @StateObject var cloudManager = CloudManager()
   @State private var showingSheet = true
 
-  let entries: [String] = ["I like pie", "Not today buddy", "Sometimes I like cakes too"]
-  
   var body: some View {
     NavigationView {
       List {
-        ForEach(entries, id: \.self) { entry in
+        ForEach(cloudManager.entries) { (entry: Entry) in
           Button(action: {
             showingSheet.toggle()
           }) {
             VStack(alignment: .leading, spacing: 2) {
-              Text(Date().shortString()).font(.subheadline).foregroundColor(.blue)
-              Text(entry)
-              Text("Some detail goes herer.")
+              Text(entry.date.shortString()).font(.subheadline).foregroundColor(.blue)
+              Text(entry.content)
             }
           }
           .sheet(isPresented: $showingSheet) {
-            EditView()
+            EditView(entry: entry, fullText: entry.content)
           }
-        }
-      }.toolbar {
-        ToolbarItem(placement: .bottomBar) {
-          Button("Press Me") {
-            print("Pressed")
-          }
-        }
-      }.padding()
+        }.onDelete(perform: delete)
+      }
+      .onAppear {
+        cloudManager.updateData()
+      }
+      .padding()
       .navigationTitle("Board")
       .toolbar {
         ToolbarItemGroup(placement: .bottomBar) {
@@ -72,7 +77,7 @@ struct ContentView: View {
                 .font(.system(size: 44.0, weight: .bold))
             }
             .sheet(isPresented: $showingSheet) {
-              EditView()
+              EditView(entry: Entry())
             }
             Text("")
           }
@@ -86,7 +91,13 @@ struct ContentView: View {
         }
       }
     }
-    
+    .environmentObject(cloudManager)
+  }
+
+  func delete(at offsets: IndexSet) {
+    // preserve all ids to be deleted to avoid indices confusing
+    let idsToDelete = offsets.map { self.cloudManager.entries[$0].id }
+    cloudManager.deleteEntries(ids: idsToDelete)
   }
 }
 
