@@ -11,13 +11,13 @@ import Foundation
 extension Date {
   func formattedStringDate() -> String {
     let dateFormatter = DateFormatter()
-    dateFormatter.dateFormat = "yyyyMMdd-HHmmss-SSS"
+    dateFormatter.dateFormat = "yyyyMMdd-HHmm-ss's'SSS"
     return dateFormatter.string(from: self)
   }
 
   func formattedDateFrom(_ text: String) -> Date? {
     let dateFormatter = DateFormatter()
-    dateFormatter.dateFormat = "yyyyMMdd-HHmmss-SSS"
+    dateFormatter.dateFormat = "yyyyMMdd-HHmm-ss's'SSS"
     return dateFormatter.date(from: text)
   }
 

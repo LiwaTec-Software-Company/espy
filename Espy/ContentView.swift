@@ -56,6 +56,8 @@ struct ContentView: View {
   @StateObject var cloudManager = CloudManager()
   @State private var isShowingEntrySheet = false
   @State private var isShowingBottomSheet = true
+  @State private var isShowingDocSheet = true
+
 
   var body: some View {
     NavigationView {
@@ -76,16 +78,23 @@ struct ContentView: View {
       }
       .onAppear {
         cloudManager.updateData()
+        isShowingBottomSheet = true
       }
       .padding()
       .navigationTitle("Board")
       .toolbar {
         ToolbarItemGroup(placement: .bottomBar) {
           Button(action: {
-            print("Edit button was tapped")
+            isShowingDocSheet.toggle()
           }) {
             Image(systemName: "gearshape")
-          }
+          }.sheet(isPresented: $isShowingDocSheet, content: {
+            DocumentPickerViewController { url in
+              print(url)
+            }.onDisappear {
+              cloudManager.updateData()
+            }
+          })
           Spacer()
           HStack {
             Button(action: {

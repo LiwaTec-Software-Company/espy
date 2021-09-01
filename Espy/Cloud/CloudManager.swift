@@ -8,6 +8,12 @@
 
 import Foundation
 
+struct DocumentsDirectory {
+  static let localDocumentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+  static let iCloudDocumentsURL = FileManager.default.url(forUbiquityContainerIdentifier: nil)?.appendingPathComponent("Documents")
+}
+
+
 class LocalManager {
   static let shared = LocalManager()
   var entryFiles: [Entry: URL] = [Entry: URL]()
@@ -16,6 +22,10 @@ class LocalManager {
     guard let entryIndex = entryFiles.index(forKey: entry) else { return }
     entryFiles.remove(at: entryIndex)
   }
+
+  func getDocumentDiretoryURL() -> URL {
+      return DocumentsDirectory.localDocumentsURL
+  }
 }
 
 class CloudManager: ObservableObject {
@@ -23,11 +33,6 @@ class CloudManager: ObservableObject {
 
   init() {
     updateData()
-  }
-
-  struct DocumentsDirectory {
-    static let localDocumentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-    static let iCloudDocumentsURL = FileManager.default.url(forUbiquityContainerIdentifier: nil)?.appendingPathComponent("Documents")
   }
 
   // Return the Document directory (Cloud OR Local)
