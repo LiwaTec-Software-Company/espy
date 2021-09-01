@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct Entry: Identifiable {
+struct Entry: Identifiable, Hashable {
   /// Unique id of the entry which is basically the date down to seconds.
   var id: UUID
   /// The date the entry was entered.
@@ -19,7 +19,7 @@ struct Entry: Identifiable {
   var content: String
   var inSaveFormat: String {
     get {
-      return content + "\n" + id.uuidString
+      return content + "\n\n" + id.uuidString
     }
   }
   /// The date formatted for use in app.

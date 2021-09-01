@@ -8,7 +8,15 @@
 
 import Foundation
 
+class LocalManager {
+  static let shared = LocalManager()
+  var entryFiles: [Entry: URL] = [Entry: URL]()
 
+  func deleteEntry(_ entry: Entry) {
+    guard let entryIndex = entryFiles.index(forKey: entry) else { return }
+    entryFiles.remove(at: entryIndex)
+  }
+}
 
 class CloudManager: ObservableObject {
   @Published var entries = [Entry]()
@@ -21,7 +29,6 @@ class CloudManager: ObservableObject {
     static let localDocumentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
     static let iCloudDocumentsURL = FileManager.default.url(forUbiquityContainerIdentifier: nil)?.appendingPathComponent("Documents")
   }
-
 
   // Return the Document directory (Cloud OR Local)
   // To do in a background thread
@@ -121,6 +128,7 @@ extension CloudManager {
 
   func addNewEntry(_ entry: Entry) {
     let fileURL = getDocumentDiretoryURL().appendingPathComponent("\(entry.formattedStringDate).md")
+    LocalManager.shared.entryFiles[entry] = fileURL
 
     do {
       try entry.inSaveFormat.write(to: fileURL, atomically: true, encoding: .utf8)
@@ -129,17 +137,19 @@ extension CloudManager {
       print("Unable to add this entry.")
     }
 
-    entries.append(entry)
+    entries.insert(entry, at: 0)
   }
 
-  func updateEntry(_ entry: Entry, at index: Int) {
-    let entryFile = getDocumentDiretoryURL().appendingPathComponent("\(entry.formattedStringDate).md")
+  func updateEntry(_ oldEntry: Entry,  new entry: Entry, at index: Int) {
+    guard let entryFile = LocalManager.shared.entryFiles[oldEntry] else { return }
+
     if doesFileExist(entryFile) {
       deleteFile(url: entryFile)
-      entries[index] = entry
-    } else {
-      addNewEntry(entry)
+      LocalManager.shared.deleteEntry(oldEntry)
     }
+
+    entries.remove(at: index)
+    addNewEntry(entry)
   }
 
   private func getEntries() -> [Entry] {
@@ -154,15 +164,16 @@ extension CloudManager {
           let content = try String(contentsOf: file, encoding: .utf8)
           var lines = content.components(separatedBy: .newlines)
 
-          let _ = print(lines)
-
           guard let lastLine = lines.last, let entryId = UUID(uuidString: lastLine) else {
-            entries.append(Entry(date: "\(fileNames[index])", content: content))
+            let entry = Entry(date: "\(fileNames[index])", content: content)
+            LocalManager.shared.entryFiles[entry] = file
+            entries.append(entry)
             continue
           }
           lines.removeLast()
-          let entryContent = lines.joined()
+          let entryContent = lines.joined(separator: "\n")
           let entry = Entry(id: entryId, date: "\(fileNames[index])", content: entryContent)
+          LocalManager.shared.entryFiles[entry] = file
           entries.append(entry)
         } catch {
           print("Cant open this particulate file :/", file)
@@ -177,6 +188,7 @@ extension CloudManager {
   func deleteEntry(_ entry: Entry) {
     let fileURL = getDocumentDiretoryURL().appendingPathComponent("\(entry.formattedStringDate).md")
     deleteFile(url: fileURL)
+    LocalManager.shared.deleteEntry(entry)
   }
 
   func deleteEntries(ids: [UUID]) {

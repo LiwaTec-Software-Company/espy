@@ -40,7 +40,7 @@ struct EditView: View {
         if isNew {
           cloudManager.addNewEntry(entry)
         } else {
-          cloudManager.updateEntry(entry, at: selectedIndex)
+          cloudManager.updateEntry(selectedEntry, new: entry, at: selectedIndex)
         }
 
         presentationMode.wrappedValue.dismiss()
