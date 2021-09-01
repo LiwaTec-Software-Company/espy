@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 import MobileCoreServices
 
-struct DocumentPickerViewController: UIViewControllerRepresentable {
+struct DocumentPicker: UIViewControllerRepresentable {
   var callback: (URL) -> ()
 
   func makeCoordinator() -> Coordinator {
@@ -18,20 +18,22 @@ struct DocumentPickerViewController: UIViewControllerRepresentable {
 
   func updateUIViewController(
     _ uiViewController: UIDocumentPickerViewController,
-    context: UIViewControllerRepresentableContext<DocumentPickerViewController>) {
+    context: UIViewControllerRepresentableContext<DocumentPicker>) {
   }
 
   func makeUIViewController(context: Context) -> UIDocumentPickerViewController {
     let controller = UIDocumentPickerViewController(documentTypes: [String(kUTTypeText)], in: .open)
     controller.directoryURL = LocalManager.shared.getDocumentDiretoryURL()
     controller.delegate = context.coordinator
+    controller.allowsMultipleSelection = true
+
     return controller
   }
 
   class Coordinator: NSObject, UIDocumentPickerDelegate {
-    var documentController: DocumentPickerViewController
+    var documentController: DocumentPicker
 
-    init(documentController: DocumentPickerViewController) {
+    init(documentController: DocumentPicker) {
       self.documentController = documentController
     }
 

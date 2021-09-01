@@ -26,6 +26,15 @@ class LocalManager {
   func getDocumentDiretoryURL() -> URL {
       return DocumentsDirectory.localDocumentsURL
   }
+
+  func getEntry(from file: URL) -> Entry? {
+    for (entry, entryFile) in entryFiles {
+      if entryFile == file {
+        return entry
+      }
+    }
+    return nil
+  }
 }
 
 class CloudManager: ObservableObject {
@@ -131,6 +140,38 @@ extension CloudManager {
     entries = getEntries()
   }
 
+  func getEntryIndex(entry: Entry) {
+
+  }
+
+  func getEntry(from file: URL) -> Entry? {
+    if let entry = LocalManager.shared.getEntry(from: file) {
+      return entry
+    }
+
+    if !file.lastPathComponent.contains(".md") { return  nil }
+    let fileName = file.deletingPathExtension().lastPathComponent
+
+    do {
+      let content = try String(contentsOf: file, encoding: .utf8)
+      var lines = content.components(separatedBy: .newlines)
+
+      guard let lastLine = lines.last, let entryId = UUID(uuidString: lastLine) else {
+        let entry = Entry(date: fileName, content: content)
+        LocalManager.shared.entryFiles[entry] = file
+        return entry
+      }
+      lines.removeLast()
+      let entryContent = lines.joined(separator: "\n")
+      let entry = Entry(id: entryId, date: fileName, content: entryContent)
+      LocalManager.shared.entryFiles[entry] = file
+      return entry
+    } catch {
+      print("Cant open this particulate file :/", file)
+      return nil
+    }
+  }
+
   func addNewEntry(_ entry: Entry) {
     let fileURL = getDocumentDiretoryURL().appendingPathComponent("\(entry.formattedStringDate).md")
     LocalManager.shared.entryFiles[entry] = fileURL
@@ -161,28 +202,12 @@ extension CloudManager {
     var entries = [Entry]()
     do {
       let files = try FileManager.default.contentsOfDirectory(at: getDocumentDiretoryURL(), includingPropertiesForKeys: nil)
-      let fileNames = files.map{ $0.deletingPathExtension().lastPathComponent }
 
       for (index, file) in files.enumerated() {
         if !file.lastPathComponent.contains(".md") { continue }
-        do {
-          let content = try String(contentsOf: file, encoding: .utf8)
-          var lines = content.components(separatedBy: .newlines)
-
-          guard let lastLine = lines.last, let entryId = UUID(uuidString: lastLine) else {
-            let entry = Entry(date: "\(fileNames[index])", content: content)
-            LocalManager.shared.entryFiles[entry] = file
-            entries.append(entry)
-            continue
-          }
-          lines.removeLast()
-          let entryContent = lines.joined(separator: "\n")
-          let entry = Entry(id: entryId, date: "\(fileNames[index])", content: entryContent)
-          LocalManager.shared.entryFiles[entry] = file
-          entries.append(entry)
-        } catch {
-          print("Cant open this particulate file :/", file)
-        }
+        guard var entry = getEntry(from: file) else { continue }
+        entry.setIndex(index)
+        entries.append(entry)
       }
     } catch {
       print("Unable to get entires from directory.")

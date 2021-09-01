@@ -21,6 +21,14 @@ struct EditView: View {
 
   init() {}
 
+  init(file: URL, cloudManager: CloudManager) {
+    if let entry = cloudManager.getEntry(from: file) {
+      self.init(index: entry.index, cloudManager: cloudManager, isNew: false)
+    } else {
+      self.init()
+    }
+  }
+
   init(index: Int, cloudManager: CloudManager, isNew: Bool = false) {
     self.selectedIndex = index
     self.selectedEntry = cloudManager.entries[selectedIndex]
@@ -57,7 +65,9 @@ struct ContentView: View {
   @State private var isShowingEntrySheet = false
   @State private var isShowingBottomSheet = true
   @State private var isShowingDocSheet = true
+  @State private var isShowingDocEntrySheet = false
 
+  @State var editViewFromDocSheet: EditView?
 
   var body: some View {
     NavigationView {
@@ -75,6 +85,14 @@ struct ContentView: View {
             EditView(index: index, cloudManager: cloudManager)
           }
         }.onDelete(perform: delete)
+        .sheet(isPresented: $isShowingDocEntrySheet) {
+          if let editView = editViewFromDocSheet {
+            editView.onDisappear {
+              self.editViewFromDocSheet = nil
+            }
+          }
+
+        }
       }
       .onAppear {
         cloudManager.updateData()
@@ -89,8 +107,9 @@ struct ContentView: View {
           }) {
             Image(systemName: "gearshape")
           }.sheet(isPresented: $isShowingDocSheet, content: {
-            DocumentPickerViewController { url in
-              print(url)
+            DocumentPicker { url in
+              self.editViewFromDocSheet = EditView(file: url, cloudManager: cloudManager)
+              isShowingDocEntrySheet.toggle()
             }.onDisappear {
               cloudManager.updateData()
             }
