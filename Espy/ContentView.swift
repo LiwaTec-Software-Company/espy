@@ -104,7 +104,7 @@ struct ContentView: View {
           Button(action: {
             isShowingDocSheet.toggle()
           }) {
-            Image(systemName: "gearshape")
+            Image(systemName: "folder")
           }.sheet(isPresented: $isShowingDocSheet, content: {
             DocumentPicker { url in
               self.editViewFromDocSheet = EditView(file: url, cloudManager: cloudManager)
