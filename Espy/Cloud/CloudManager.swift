@@ -16,7 +16,7 @@ struct DocumentsDirectory {
 
 class LocalManager {
   static let shared = LocalManager()
-  var entryFiles: [Entry: URL] = [Entry: URL]()
+  var entryFiles: [Entry: String] = [Entry: String]()
 
   func deleteEntry(_ entry: Entry) {
     guard let entryIndex = entryFiles.index(forKey: entry) else { return }
@@ -28,8 +28,17 @@ class LocalManager {
   }
 
   func getEntry(from file: URL) -> Entry? {
-    for (entry, entryFile) in entryFiles {
-      if entryFile == file {
+    for (entry, entryFilePath) in entryFiles {
+      if entryFilePath == file.path {
+        return entry
+      }
+    }
+    return nil
+  }
+
+  func getEntry(from filePath: String) -> Entry? {
+    for (entry, entryFilePath) in entryFiles {
+      if entryFilePath == filePath {
         return entry
       }
     }
@@ -59,6 +68,10 @@ class CloudManager: ObservableObject {
     return FileManager.default.fileExists(atPath: url.path)
   }
 
+  func doesFileExist(_ filePath: String) -> Bool {
+    return FileManager.default.fileExists(atPath: filePath)
+  }
+
   // Return true if iCloud is enabled
 
   func isCloudEnabled() -> Bool {
@@ -86,6 +99,16 @@ class CloudManager: ObservableObject {
 
     do {
       try fileManager.removeItem(at: url)
+    } catch let error as NSError {
+      print("Failed deleting files : \(error)")
+    }
+  }
+
+  func deleteFile(filePath: String) {
+    let fileManager = FileManager.default
+
+    do {
+      try fileManager.removeItem(atPath: filePath)
     } catch let error as NSError {
       print("Failed deleting files : \(error)")
     }
@@ -158,13 +181,13 @@ extension CloudManager {
 
       guard let lastLine = lines.last, let entryId = UUID(uuidString: lastLine) else {
         let entry = Entry(date: fileName, content: content)
-        LocalManager.shared.entryFiles[entry] = file
+        LocalManager.shared.entryFiles[entry] = file.path
         return entry
       }
       lines.removeLast()
       let entryContent = lines.joined(separator: "\n")
       let entry = Entry(id: entryId, date: fileName, content: entryContent)
-      LocalManager.shared.entryFiles[entry] = file
+      LocalManager.shared.entryFiles[entry] = file.path
       return entry
     } catch {
       print("Cant open this particulate file :/", file)
@@ -174,7 +197,7 @@ extension CloudManager {
 
   func addNewEntry(_ entry: Entry) {
     let fileURL = getDocumentDiretoryURL().appendingPathComponent("\(entry.formattedStringDate).md")
-    LocalManager.shared.entryFiles[entry] = fileURL
+    LocalManager.shared.entryFiles[entry] = fileURL.path
 
     do {
       try entry.inSaveFormat.write(to: fileURL, atomically: true, encoding: .utf8)
@@ -187,10 +210,10 @@ extension CloudManager {
   }
 
   func updateEntry(_ oldEntry: Entry,  new entry: Entry, at index: Int) {
-    guard let entryFile = LocalManager.shared.entryFiles[oldEntry] else { return }
+    guard let entryFilePath = LocalManager.shared.entryFiles[oldEntry] else { return }
 
-    if doesFileExist(entryFile) {
-      deleteFile(url: entryFile)
+    if doesFileExist(entryFilePath) {
+      deleteFile(filePath: entryFilePath)
       LocalManager.shared.deleteEntry(oldEntry)
     }
 
@@ -208,6 +231,7 @@ extension CloudManager {
         guard var entry = getEntry(from: file) else { continue }
         entry.setIndex(index)
         entries.append(entry)
+        LocalManager.shared.entryFiles[entry] = file.path
       }
     } catch {
       print("Unable to get entires from directory.")

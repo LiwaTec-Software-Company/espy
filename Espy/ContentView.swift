@@ -12,6 +12,10 @@ struct EditView: View {
   @EnvironmentObject var cloudManager: CloudManager
 
   @State var fullText: String = ""
+  @State var isTextUpdated: Bool = false
+  @State private var currentDate: Date = Date()
+
+  private var originalText: String = ""
 
   var selectedIndex: Int = 0
   var selectedEntry: Entry = Entry()
@@ -22,8 +26,14 @@ struct EditView: View {
   init() {}
 
   init(file: URL, cloudManager: CloudManager) {
+    self.init()
     if let entry = cloudManager.getEntry(from: file) {
-      self.init(index: entry.index, cloudManager: cloudManager, isNew: false)
+      self.selectedIndex = entry.index
+      self.selectedEntry = entry
+
+      self.isNew = false
+      _fullText = State(initialValue: selectedEntry.content)
+      originalText = self.fullText
     } else {
       self.init()
     }
@@ -35,14 +45,25 @@ struct EditView: View {
 
     self.isNew = isNew
     _fullText = State(initialValue: selectedEntry.content)
+    originalText = self.fullText
   }
 
   var body: some View {
     VStack(alignment: .center, spacing: 4.0, content: {
-      Text(selectedEntry.date.displayDate()).padding(/*@START_MENU_TOKEN@*/10/*@END_MENU_TOKEN@*/).font(.title3).foregroundColor(.white)
-      Text(selectedEntry.id.uuidString).padding(/*@START_MENU_TOKEN@*/10/*@END_MENU_TOKEN@*/).font(.subheadline).foregroundColor(isNew ? .green : .blue)
-      TextEditor(text: $fullText).padding(/*@START_MENU_TOKEN@*/10/*@END_MENU_TOKEN@*/)
+      VStack(alignment: .center, spacing: 1) {
+        Text(selectedEntry.date.displayDate()).padding(/*@START_MENU_TOKEN@*/10/*@END_MENU_TOKEN@*/).font(.title3).foregroundColor(isNew ? .green : .white)
+        Text(selectedEntry.id.uuidString).padding(/*@START_MENU_TOKEN@*/10/*@END_MENU_TOKEN@*/).font(.caption).foregroundColor(isNew ? .green : .gray)
+        Text(currentDate.formattedStringDate()).padding(/*@START_MENU_TOKEN@*/10/*@END_MENU_TOKEN@*/).font(.caption).foregroundColor((isTextUpdated || isNew) ? .green : .gray)
+      }
+      TextEditor(text: $fullText).padding(/*@START_MENU_TOKEN@*/10/*@END_MENU_TOKEN@*/).onChange(of: fullText, perform: { value in
+        isTextUpdated = fullText != originalText
+        currentDate = Date()
+      })
       Button(action: {
+        guard isTextUpdated else {
+          presentationMode.wrappedValue.dismiss()
+          return
+        }
         let entry = Entry(entry: selectedEntry, content: fullText)
 
         if isNew {
@@ -84,13 +105,6 @@ struct ContentView: View {
           .sheet(isPresented: $isShowingEntrySheet) {
             EditView(index: index, cloudManager: cloudManager)
           }
-          .sheet(isPresented: $isShowingDocEntrySheet) {
-            if let editView = editViewFromDocSheet {
-              editView.onDisappear {
-                self.editViewFromDocSheet = nil
-              }
-            }
-          }
         }.onDelete(perform: delete)
       }
       .onAppear {
@@ -112,7 +126,14 @@ struct ContentView: View {
             }.onDisappear {
               cloudManager.updateData()
             }
-          })
+          }).sheet(isPresented: $isShowingDocEntrySheet) {
+            if let editView = editViewFromDocSheet {
+              editView.onDisappear {
+                self.editViewFromDocSheet = nil
+                isShowingDocSheet = false
+              }
+            }
+          }
           Spacer()
           HStack {
             Button(action: {
