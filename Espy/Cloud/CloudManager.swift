@@ -195,7 +195,7 @@ extension CloudManager {
     }
   }
 
-  func addNewEntry(_ entry: Entry) {
+  func addNewEntry(_ entry: Entry, at index: Int = 0) {
     let fileURL = getDocumentDiretoryURL().appendingPathComponent("\(entry.formattedStringDate).md")
     LocalManager.shared.entryFiles[entry] = fileURL.path
 
@@ -206,7 +206,7 @@ extension CloudManager {
       print("Unable to add this entry.")
     }
 
-    entries.insert(entry, at: 0)
+    entries.insert(entry, at: index)
   }
 
   func updateEntry(_ oldEntry: Entry,  new entry: Entry, at index: Int) {
@@ -218,7 +218,7 @@ extension CloudManager {
     }
 
     entries.remove(at: index)
-    addNewEntry(entry)
+    addNewEntry(entry, at: index)
   }
 
   private func getEntries() -> [Entry] {

@@ -51,32 +51,28 @@ struct EditView: View {
   var body: some View {
     VStack(alignment: .center, spacing: 4.0, content: {
       VStack(alignment: .center, spacing: 1) {
-        Text(selectedEntry.date.displayDate()).padding(/*@START_MENU_TOKEN@*/10/*@END_MENU_TOKEN@*/).font(.title3).foregroundColor(isNew ? .green : .white)
-        Text(selectedEntry.id.uuidString).padding(/*@START_MENU_TOKEN@*/10/*@END_MENU_TOKEN@*/).font(.caption).foregroundColor(isNew ? .green : .gray)
-        Text(currentDate.formattedStringDate()).padding(/*@START_MENU_TOKEN@*/10/*@END_MENU_TOKEN@*/).font(.caption).foregroundColor((isTextUpdated || isNew) ? .green : .gray)
+        Text(selectedEntry.date.displayDate()).padding(5).font(.title3).foregroundColor(isNew ? .green : .primary)
+        Text(selectedEntry.id.uuidString).padding(0).font(.caption).foregroundColor(isNew ? .green : .gray)
+        Text(currentDate.formattedStringDate()).padding(5).font(.caption).foregroundColor((isTextUpdated || isNew) ? .green : .gray)
       }
-      TextEditor(text: $fullText).padding(/*@START_MENU_TOKEN@*/10/*@END_MENU_TOKEN@*/).onChange(of: fullText, perform: { value in
+      TextEditor(text: $fullText).padding(10).onChange(of: fullText, perform: { value in
         isTextUpdated = fullText != originalText
         currentDate = Date()
       })
       Button(action: {
-        guard isTextUpdated else {
-          presentationMode.wrappedValue.dismiss()
-          return
-        }
         let entry = Entry(entry: selectedEntry, content: fullText)
 
         if isNew {
           cloudManager.addNewEntry(entry)
-        } else {
+        } else if isTextUpdated {
           cloudManager.updateEntry(selectedEntry, new: entry, at: selectedIndex)
         }
 
         presentationMode.wrappedValue.dismiss()
       }, label: {
         Image(systemName: "chevron.compact.down")
-          .font(.system(size: 44.0, weight: .bold))
-      })
+          .font(.system(size: 44.0, weight: .bold)).foregroundColor((isTextUpdated || isNew) ? .green : .accentColor)
+      }).padding(20)
     })
   }
 }
@@ -85,7 +81,7 @@ struct ContentView: View {
   @StateObject var cloudManager = CloudManager()
   @State private var isShowingEntrySheet = false
   @State private var isShowingBottomSheet = true
-  @State private var isShowingDocSheet = true
+  @State private var isShowingDocSheet = false
   @State private var isShowingDocEntrySheet = false
 
   @State var editViewFromDocSheet: EditView?
@@ -98,7 +94,7 @@ struct ContentView: View {
             isShowingEntrySheet.toggle()
           }) {
             VStack(alignment: .leading, spacing: 2) {
-              Text(entry.date.shortString()).font(.subheadline).foregroundColor(.blue)
+              Text(entry.date.shortString()).font(.subheadline).foregroundColor(.accentColor)
               Text(entry.content)
             }
           }
