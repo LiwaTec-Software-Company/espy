@@ -7,6 +7,27 @@
 
 import SwiftUI
 
+struct EntryRow: View {
+  var entry: Entry
+  var isSelected: Bool = false
+  var action: () -> Void
+
+  var body: some View {
+    Button(action: self.action) {
+      HStack {
+        VStack(alignment: .leading, spacing: 2) {
+          Text(entry.date.shortString()).font(.subheadline).foregroundColor(.accentColor)
+          Text(entry.content)
+        }
+        if self.isSelected {
+          Spacer()
+          Image(systemName: "checkmark")
+        }
+      }
+    }
+  }
+}
+
 struct EditView: View {
   @Environment(\.presentationMode) var presentationMode
   @EnvironmentObject var cloudManager: CloudManager
@@ -86,19 +107,16 @@ struct ContentView: View {
 
   @State var editViewFromDocSheet: EditView?
 
+  @State var selections: [Entry] = []
+
+
   var body: some View {
     NavigationView {
       List {
         ForEachWithIndex(cloudManager.entries) { (index: Int, entry: Entry) in
-          Button(action: {
+          EntryRow(entry: entry, action: {
             isShowingEntrySheet.toggle()
-          }) {
-            VStack(alignment: .leading, spacing: 2) {
-              Text(entry.date.shortString()).font(.subheadline).foregroundColor(.accentColor)
-              Text(entry.content)
-            }
-          }
-          .sheet(isPresented: $isShowingEntrySheet) {
+          }).sheet(isPresented: $isShowingEntrySheet) {
             EditView(index: index, cloudManager: cloudManager)
           }
         }.onDelete(perform: delete)
