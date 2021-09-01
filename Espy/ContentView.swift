@@ -84,15 +84,14 @@ struct ContentView: View {
           .sheet(isPresented: $isShowingEntrySheet) {
             EditView(index: index, cloudManager: cloudManager)
           }
-        }.onDelete(perform: delete)
-        .sheet(isPresented: $isShowingDocEntrySheet) {
-          if let editView = editViewFromDocSheet {
-            editView.onDisappear {
-              self.editViewFromDocSheet = nil
+          .sheet(isPresented: $isShowingDocEntrySheet) {
+            if let editView = editViewFromDocSheet {
+              editView.onDisappear {
+                self.editViewFromDocSheet = nil
+              }
             }
           }
-
-        }
+        }.onDelete(perform: delete)
       }
       .onAppear {
         cloudManager.updateData()
