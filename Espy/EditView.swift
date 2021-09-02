@@ -10,7 +10,7 @@ import SwiftUI
 struct EditView: View {
   @Environment(\.presentationMode) var presentationMode
 
-  @State var fullText: String = ""
+  @State var fullText: String = "# "
   @State var isTextUpdated: Bool = false
   @State private var currentDate: Date = Date()
 
