@@ -26,7 +26,7 @@ struct EditView: View {
 
   init(file: URL) {
     self.init()
-    if let entry = LocalManager.shared.getEntry(from: file) {
+    if let entry = LocalManager.shared.getEntry(for: file) {
       self.selectedIndex = entry.index
       self.selectedEntry = entry
 

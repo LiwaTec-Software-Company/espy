@@ -17,7 +17,7 @@ struct EntryRow: View {
     Button(action: self.action) {
       HStack {
         VStack(alignment: .leading, spacing: 2) {
-          Text(entry.date.shortString()).font(.subheadline).foregroundColor(.accentColor)
+          Text(entry.lastUpdated.shortString()).font(.subheadline).foregroundColor(.accentColor)
           Text(entry.content)
         }
         if self.isSelected {

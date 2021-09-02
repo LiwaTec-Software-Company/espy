@@ -69,6 +69,15 @@ class LocalManager {
       print("Failed deleting files : \(error)")
     }
   }
+
+  func fileModificationDate(url: URL) -> Date? {
+      do {
+          let attr = try fileManager.attributesOfItem(atPath: url.path)
+          return attr[FileAttributeKey.modificationDate] as? Date
+      } catch {
+          return nil
+      }
+  }
 }
 
 // MARK - Entry
@@ -89,9 +98,9 @@ extension LocalManager {
   }
 
   // READ
-  func getEntry(from file: URL) -> Entry? {
+  func getEntry(for entryFile: URL) -> Entry? {
     for (entry, entryFilePath) in entryFiles {
-      if entryFilePath == file.path {
+      if entryFilePath == entryFile.path {
         return entry
       }
     }
@@ -109,24 +118,31 @@ extension LocalManager {
   }
 
   func getEntryInDirectory(from file: URL) -> Entry? {
-    if let entry = getEntry(from: file) {
+    if let entry = getEntry(for: file) {
       return entry
     }
 
     if !file.lastPathComponent.contains(".md") { return  nil }
     let fileName = file.deletingPathExtension().lastPathComponent
+    let lastUpdated = fileModificationDate(url: file)
 
     do {
       let content = try String(contentsOf: file, encoding: .utf8)
       var lines = content.components(separatedBy: .newlines)
 
       guard let lastLine = lines.last, let entryId = UUID(uuidString: lastLine) else {
-        let entry = Entry(date: fileName, content: content)
+        var entry = Entry(date: fileName, content: content)
+        if let lastUpdated = lastUpdated {
+          entry.setLastUpdated(lastUpdated)
+        }
         return entry
       }
       lines.removeLast()
       let entryContent = lines.joined(separator: "\n")
-      let entry = Entry(id: entryId, date: fileName, content: entryContent)
+      var entry = Entry(id: entryId, date: fileName, content: entryContent)
+      if let lastUpdated = lastUpdated {
+        entry.setLastUpdated(lastUpdated)
+      }
       return entry
     } catch {
       print("Cant open this particulate file :/", file)
@@ -160,7 +176,7 @@ extension LocalManager {
       EntryManager.shared.entries.remove(at: index)
     }
 
-    addNewEntryFileFor(entry, at: index)
+    addNewEntryFileFor(entry)
   }
 
   // DESTROY

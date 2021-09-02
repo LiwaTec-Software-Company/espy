@@ -74,4 +74,8 @@ struct Entry: Identifiable, Hashable {
   mutating func setIndex(_ index: Int) {
     self.index = index
   }
+
+  mutating func setLastUpdated(_ date: Date) {
+    self.lastUpdated = date
+  }
 }
