@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3D29477D26E04C010086CC65 /* EditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D29477C26E04C000086CC65 /* EditView.swift */; };
+		3D29477F26E04D5A0086CC65 /* AlphaBackgroundView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D29477E26E04D590086CC65 /* AlphaBackgroundView.swift */; };
 		3D699A2C26DEE21F00E9755E /* ForEachWithIndex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D699A2B26DEE21F00E9755E /* ForEachWithIndex.swift */; };
 		3D699A2E26DF1CE400E9755E /* DocumentPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D699A2D26DF1CE400E9755E /* DocumentPicker.swift */; };
 		3DE8537626DC774400D5E146 /* EspyApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DE8537526DC774400D5E146 /* EspyApp.swift */; };
@@ -41,6 +43,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		3D29477C26E04C000086CC65 /* EditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditView.swift; sourceTree = "<group>"; };
+		3D29477E26E04D590086CC65 /* AlphaBackgroundView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlphaBackgroundView.swift; sourceTree = "<group>"; };
 		3D699A2B26DEE21F00E9755E /* ForEachWithIndex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForEachWithIndex.swift; sourceTree = "<group>"; };
 		3D699A2D26DF1CE400E9755E /* DocumentPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentPicker.swift; sourceTree = "<group>"; };
 		3DE8537226DC774400D5E146 /* Espy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Espy.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -119,6 +123,7 @@
 				3DE8537926DC774A00D5E146 /* Assets.xcassets */,
 				3DE8537E26DC774A00D5E146 /* Info.plist */,
 				3DE8537B26DC774A00D5E146 /* Preview Content */,
+				3D29477C26E04C000086CC65 /* EditView.swift */,
 			);
 			path = Espy;
 			sourceTree = "<group>";
@@ -161,6 +166,7 @@
 			isa = PBXGroup;
 			children = (
 				3DE853AB26DD714200D5E146 /* Date+Extensions.swift */,
+				3D29477E26E04D590086CC65 /* AlphaBackgroundView.swift */,
 				3DE853AC26DD714200D5E146 /* TimeInterval+Extensions.swift */,
 				3DE853A326DD6DCF00D5E146 /* Style.swift */,
 				3D699A2B26DEE21F00E9755E /* ForEachWithIndex.swift */,
@@ -309,10 +315,12 @@
 			files = (
 				3DE853A426DD6DD000D5E146 /* CloudManager.swift in Sources */,
 				3DE8537826DC774400D5E146 /* ContentView.swift in Sources */,
+				3D29477D26E04C010086CC65 /* EditView.swift in Sources */,
 				3D699A2C26DEE21F00E9755E /* ForEachWithIndex.swift in Sources */,
 				3DE853AD26DD714200D5E146 /* Date+Extensions.swift in Sources */,
 				3DE8537626DC774400D5E146 /* EspyApp.swift in Sources */,
 				3D699A2E26DF1CE400E9755E /* DocumentPicker.swift in Sources */,
+				3D29477F26E04D5A0086CC65 /* AlphaBackgroundView.swift in Sources */,
 				3DE853A926DD710700D5E146 /* User.swift in Sources */,
 				3DE853A526DD6DD000D5E146 /* Style.swift in Sources */,
 				3DE853AA26DD710700D5E146 /* Entry.swift in Sources */,
