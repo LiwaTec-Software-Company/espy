@@ -12,23 +12,38 @@ struct EntryRow: View {
   var entry: Entry
   var isSelected: Bool = false
   var action: () -> Void
+  var secondaryAction: () -> Void
+
 
   var body: some View {
-    Button(action: self.action) {
+    Button(action: {}) {
       HStack {
         VStack(alignment: .leading, spacing: 2) {
-          Text(entry.lastUpdated.shortString()).font(.subheadline).foregroundColor(.accentColor)
+          HStack(alignment: .firstTextBaseline) {
+            Text(entry.date.shortString()).font(.caption).foregroundColor(.accentColor)
+            Spacer()
+            Text(entry.lastUpdated.shortString())
+              .font(.caption).foregroundColor(.gray)
+          }
           Text(entry.content)
+
         }
-        if self.isSelected {
-          Spacer()
-          Image(systemName: "checkmark").foregroundColor(.accentColor)
-        } else if isMultiSelectOn {
-          Spacer()
-          Image(systemName: "checkmark").foregroundColor(.gray)
-        }
-      }
+      }.frame(maxWidth: .infinity, maxHeight: .infinity).padding().background(Color.black)
     }
+    .overlay(
+      RoundedRectangle(cornerRadius: 10)
+        .stroke(isSelected ? Color.accentColor : Color.gray, lineWidth: isSelected ? 4 : isMultiSelectOn ? 1 : 0)
+    )
+    .simultaneousGesture(
+      LongPressGesture(minimumDuration: 1).onEnded { _ in
+          secondaryAction()
+        }
+    )
+    .highPriorityGesture(
+      TapGesture().onEnded { _ in
+        action()
+      }
+    )
   }
 }
 
@@ -53,6 +68,8 @@ struct ContentView: View {
             } else {
               isShowingEntrySheet.toggle()
             }
+          }, secondaryAction: {
+            self.isMultiSelectOn.toggle()
           }).sheet(isPresented: $isShowingEntrySheet) {
             EditView(index: index)
           }
