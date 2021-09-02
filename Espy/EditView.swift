@@ -9,7 +9,6 @@ import SwiftUI
 
 struct EditView: View {
   @Environment(\.presentationMode) var presentationMode
-  @EnvironmentObject var cloudManager: CloudManager
 
   @State var fullText: String = ""
   @State var isTextUpdated: Bool = false
@@ -25,9 +24,9 @@ struct EditView: View {
 
   init() {}
 
-  init(file: URL, cloudManager: CloudManager) {
+  init(file: URL) {
     self.init()
-    if let entry = cloudManager.getEntry(from: file) {
+    if let entry = LocalManager.shared.getEntry(from: file) {
       self.selectedIndex = entry.index
       self.selectedEntry = entry
 
@@ -39,9 +38,9 @@ struct EditView: View {
     }
   }
 
-  init(index: Int, cloudManager: CloudManager, isNew: Bool = false) {
+  init(index: Int, isNew: Bool = false) {
     self.selectedIndex = index
-    self.selectedEntry = cloudManager.entries[selectedIndex]
+    self.selectedEntry = EntryManager.shared.entries[selectedIndex]
 
     self.isNew = isNew
     _fullText = State(initialValue: selectedEntry.content)
@@ -63,9 +62,9 @@ struct EditView: View {
         let entry = Entry(entry: selectedEntry, content: fullText)
 
         if isNew {
-          cloudManager.addNewEntry(entry)
+          LocalManager.shared.addNewEntryFileFor(entry)
         } else if isTextUpdated {
-          cloudManager.updateEntry(selectedEntry, new: entry, at: selectedIndex)
+          LocalManager.shared.updateEntryFile(selectedEntry, new: entry, at: selectedIndex)
         }
 
         presentationMode.wrappedValue.dismiss()

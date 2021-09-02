@@ -33,8 +33,7 @@ struct EntryRow: View {
 }
 
 struct ContentView: View {
-  @StateObject var cloudManager = CloudManager()
-
+  @ObservedObject private var entryManager = EntryManager.shared
   @State private var isShowingEntrySheet = false
   @State private var isShowingBottomSheet = true
   @State private var isShowingDocSheet = false
@@ -47,7 +46,7 @@ struct ContentView: View {
   var body: some View {
     NavigationView {
       List {
-        ForEachWithIndex(cloudManager.entries) { (index: Int, entry: Entry) in
+        ForEachWithIndex(entryManager.entries) { (index: Int, entry: Entry) in
           EntryRow(isMultiSelectOn: $isMultiSelectOn, entry: entry, isSelected: self.entriesSelected.contains(entry), action: {
             if isMultiSelectOn {
               selectEntryRow(entry: entry)
@@ -55,12 +54,12 @@ struct ContentView: View {
               isShowingEntrySheet.toggle()
             }
           }).sheet(isPresented: $isShowingEntrySheet) {
-            EditView(index: index, cloudManager: cloudManager)
+            EditView(index: index)
           }
         }.onDelete(perform: delete)
       }
       .onAppear {
-        cloudManager.updateData()
+        LocalManager.shared.loadAllEntryFiles()
         isShowingBottomSheet = true
       }
       .navigationTitle("Board")
@@ -72,10 +71,10 @@ struct ContentView: View {
             Image(systemName: "folder")
           }.sheet(isPresented: $isShowingDocSheet, content: {
             DocumentPicker { url in
-              self.editViewFromDocSheet = EditView(file: url, cloudManager: cloudManager)
+              self.editViewFromDocSheet = EditView(file: url)
               isShowingDocEntrySheet.toggle()
             }.onDisappear {
-              cloudManager.updateData()
+              LocalManager.shared.loadAllEntryFiles()
             }
 
           }).sheet(isPresented: $isShowingDocEntrySheet) {
@@ -108,13 +107,12 @@ struct ContentView: View {
         }
       }
     }
-    .environmentObject(cloudManager)
   }
 
   func delete(at offsets: IndexSet) {
     // preserve all ids to be deleted to avoid indices confusing
-    let idsToDelete = offsets.map { self.cloudManager.entries[$0].id }
-    cloudManager.deleteEntries(ids: idsToDelete)
+    let entriesToDelete = offsets.map { entryManager.entries[$0] }
+    LocalManager.shared.deleteEntryFiles(entriesToDelete)
   }
 
   func selectEntryRow(entry: Entry) {

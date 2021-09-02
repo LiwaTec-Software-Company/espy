@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3D1A477126E0723900583474 /* LocalManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D1A477026E0723900583474 /* LocalManager.swift */; };
+		3D1A477326E0724B00583474 /* EntryManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D1A477226E0724B00583474 /* EntryManager.swift */; };
 		3D29477D26E04C010086CC65 /* EditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D29477C26E04C000086CC65 /* EditView.swift */; };
 		3D29477F26E04D5A0086CC65 /* AlphaBackgroundView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D29477E26E04D590086CC65 /* AlphaBackgroundView.swift */; };
 		3D699A2C26DEE21F00E9755E /* ForEachWithIndex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D699A2B26DEE21F00E9755E /* ForEachWithIndex.swift */; };
@@ -43,6 +45,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		3D1A477026E0723900583474 /* LocalManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalManager.swift; sourceTree = "<group>"; };
+		3D1A477226E0724B00583474 /* EntryManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntryManager.swift; sourceTree = "<group>"; };
 		3D29477C26E04C000086CC65 /* EditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditView.swift; sourceTree = "<group>"; };
 		3D29477E26E04D590086CC65 /* AlphaBackgroundView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlphaBackgroundView.swift; sourceTree = "<group>"; };
 		3D699A2B26DEE21F00E9755E /* ForEachWithIndex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForEachWithIndex.swift; sourceTree = "<group>"; };
@@ -158,6 +162,8 @@
 			isa = PBXGroup;
 			children = (
 				3DE853A126DD6DCD00D5E146 /* CloudManager.swift */,
+				3D1A477026E0723900583474 /* LocalManager.swift */,
+				3D1A477226E0724B00583474 /* EntryManager.swift */,
 			);
 			path = Cloud;
 			sourceTree = "<group>";
@@ -314,6 +320,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				3DE853A426DD6DD000D5E146 /* CloudManager.swift in Sources */,
+				3D1A477126E0723900583474 /* LocalManager.swift in Sources */,
+				3D1A477326E0724B00583474 /* EntryManager.swift in Sources */,
 				3DE8537826DC774400D5E146 /* ContentView.swift in Sources */,
 				3D29477D26E04C010086CC65 /* EditView.swift in Sources */,
 				3D699A2C26DEE21F00E9755E /* ForEachWithIndex.swift in Sources */,
