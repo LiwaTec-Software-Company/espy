@@ -81,6 +81,14 @@ struct ContentView: View {
       }
       .navigationTitle("Board")
       .toolbar {
+        ToolbarItem(placement: .primaryAction) {
+            Button(action: {
+              deleteAllSelectedEntries()
+            }, label: {
+                Image(systemName: "trash")
+            })
+        }
+
         ToolbarItemGroup(placement: .bottomBar) {
           Button(action: {
             isShowingDocSheet.toggle()
@@ -130,6 +138,11 @@ struct ContentView: View {
     // preserve all ids to be deleted to avoid indices confusing
     let entriesToDelete = offsets.map { entryManager.entries[$0] }
     LocalManager.shared.deleteEntryFiles(entriesToDelete)
+  }
+
+  func deleteAllSelectedEntries() {
+    LocalManager.shared.deleteEntryFiles(entriesSelected)
+    entriesSelected.removeAll()
   }
 
   func selectEntryRow(entry: Entry) {
