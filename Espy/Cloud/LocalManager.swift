@@ -182,8 +182,9 @@ extension LocalManager {
   // DESTROY
   func deleteEntryFile(_ entry: Entry) {
     guard let entryIndex = entryFiles.index(forKey: entry) else { return }
-    entryFiles.remove(at: entryIndex)
+    let deleteMe = entryFiles.remove(at: entryIndex)
     EntryManager.shared.removeEntry(entry)
+    deleteFile(filePath: deleteMe.value)
   }
 
   func deleteEntryFiles(_ entries: [Entry]) {
