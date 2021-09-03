@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -13,6 +13,7 @@
 		3D29477F26E04D5A0086CC65 /* AlphaBackgroundView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D29477E26E04D590086CC65 /* AlphaBackgroundView.swift */; };
 		3D699A2C26DEE21F00E9755E /* ForEachWithIndex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D699A2B26DEE21F00E9755E /* ForEachWithIndex.swift */; };
 		3D699A2E26DF1CE400E9755E /* DocumentPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D699A2D26DF1CE400E9755E /* DocumentPicker.swift */; };
+		3D95EA2626E1B5D300B72D86 /* MarkdownUI in Frameworks */ = {isa = PBXBuildFile; productRef = 3D95EA2526E1B5D300B72D86 /* MarkdownUI */; };
 		3DE8537626DC774400D5E146 /* EspyApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DE8537526DC774400D5E146 /* EspyApp.swift */; };
 		3DE8537826DC774400D5E146 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DE8537726DC774400D5E146 /* ContentView.swift */; };
 		3DE8537A26DC774A00D5E146 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3DE8537926DC774A00D5E146 /* Assets.xcassets */; };
@@ -76,6 +77,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3D95EA2626E1B5D300B72D86 /* MarkdownUI in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -206,6 +208,9 @@
 			dependencies = (
 			);
 			name = Espy;
+			packageProductDependencies = (
+				3D95EA2526E1B5D300B72D86 /* MarkdownUI */,
+			);
 			productName = Espy;
 			productReference = 3DE8537226DC774400D5E146 /* Espy.app */;
 			productType = "com.apple.product-type.application";
@@ -277,6 +282,9 @@
 				Base,
 			);
 			mainGroup = 3DE8536926DC774400D5E146;
+			packageReferences = (
+				3D95EA2426E1B5D300B72D86 /* XCRemoteSwiftPackageReference "MarkdownUI" */,
+			);
 			productRefGroup = 3DE8537326DC774400D5E146 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -652,6 +660,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		3D95EA2426E1B5D300B72D86 /* XCRemoteSwiftPackageReference "MarkdownUI" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/gonzalezreal/MarkdownUI";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.5.2;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		3D95EA2526E1B5D300B72D86 /* MarkdownUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3D95EA2426E1B5D300B72D86 /* XCRemoteSwiftPackageReference "MarkdownUI" */;
+			productName = MarkdownUI;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 3DE8536A26DC774400D5E146 /* Project object */;
 }

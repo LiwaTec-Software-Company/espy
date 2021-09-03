@@ -20,15 +20,16 @@ struct EntryRow: View {
       HStack {
         VStack(alignment: .leading, spacing: 2) {
           HStack(alignment: .firstTextBaseline) {
-            Text(entry.date.shortString()).font(.caption).foregroundColor(.accentColor)
+            Text(entry.date.shortString())
+              .font(.caption).foregroundColor(.accentColor)
             Spacer()
             Text(entry.lastUpdated.shortString())
               .font(.caption).foregroundColor(.gray)
           }
-          Text(entry.content)
-
+          Text(entry.content).foregroundColor(.primary)
         }
-      }.frame(maxWidth: .infinity, maxHeight: .infinity).padding().background(Color.black)
+      }
+      .frame(maxWidth: .infinity, maxHeight: .infinity).padding().background(Color.black)
     }
     .overlay(
       RoundedRectangle(cornerRadius: 10)
@@ -56,24 +57,29 @@ struct ContentView: View {
 
   @State var editViewFromDocSheet: EditView?
   @State var entriesSelected: [Entry] = []
-  @State var isMultiSelectOn: Bool = false
+  @State var isMultiSelectOn: Bool = true
 
   var body: some View {
     NavigationView {
-      List {
-        ForEachWithIndex(entryManager.entries) { (index: Int, entry: Entry) in
-          EntryRow(isMultiSelectOn: $isMultiSelectOn, entry: entry, isSelected: self.entriesSelected.contains(entry), action: {
-            if isMultiSelectOn {
-              selectEntryRow(entry: entry)
-            } else {
-              isShowingEntrySheet.toggle()
+      ScrollView {
+        LazyVStack {
+          ForEachWithIndex(entryManager.entries) { (index: Int, entry: Entry) in
+            EntryRow(isMultiSelectOn: $isMultiSelectOn, entry: entry, isSelected: self.entriesSelected.contains(entry), action: {
+              if isMultiSelectOn {
+                selectRow(with: entry)
+              } else {
+                isShowingEntrySheet.toggle()
+              }
+            }, secondaryAction: {
+              self.isMultiSelectOn.toggle()
+            })
+            .padding(isMultiSelectOn ? 10 : 0)
+            .sheet(isPresented: $isShowingEntrySheet) {
+              EditView(index: index)
             }
-          }, secondaryAction: {
-            self.isMultiSelectOn.toggle()
-          }).sheet(isPresented: $isShowingEntrySheet) {
-            EditView(index: index)
           }
-        }.onDelete(perform: delete)
+          .onDelete(perform: delete)
+        }
       }
       .onAppear {
         LocalManager.shared.loadAllEntryFiles()
@@ -84,7 +90,9 @@ struct ContentView: View {
         ToolbarItem(placement: .destructiveAction) {
           HStack{
             Button(action: {
-              deleteAllSelectedEntries()
+              if isMultiSelectOn {
+                deleteAllSelectedEntries()
+              }
               isMultiSelectOn.toggle()
             }, label: {
               Image(systemName: "trash")
@@ -151,7 +159,7 @@ struct ContentView: View {
     entriesSelected.removeAll()
   }
 
-  func selectEntryRow(entry: Entry) {
+  func selectRow(with entry: Entry) {
     if self.entriesSelected.contains(entry) {
       self.entriesSelected.removeAll(where: { $0 == entry })
     }
