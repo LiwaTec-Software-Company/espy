@@ -85,6 +85,7 @@ struct ContentView: View {
           HStack{
             Button(action: {
               deleteAllSelectedEntries()
+              isMultiSelectOn.toggle()
             }, label: {
               Image(systemName: "trash")
                 .font(Font.system(size: isMultiSelectOn ? 25 : 15))
