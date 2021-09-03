@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import MarkdownUI
 
 struct EntryRow: View {
   @Binding var isMultiSelectOn: Bool
@@ -14,7 +15,7 @@ struct EntryRow: View {
   var action: () -> Void
   var secondaryAction: () -> Void
 
-
+  @ViewBuilder
   var body: some View {
     Button(action: {}) {
       HStack {
@@ -26,7 +27,16 @@ struct EntryRow: View {
             Text(entry.lastUpdated.shortString())
               .font(.caption).foregroundColor(.gray)
           }
-          Text(entry.content).foregroundColor(.primary)
+//          Text(entry.content).foregroundColor(.primary)
+          let contentLines = entry.content.split(separator: "\n")
+          LazyVStack {
+            ForEachWithIndex(contentLines, id: \.self) { index, line in
+              Markdown("\(line)").disabled(true)
+            }
+          }
+          .if(isMultiSelectOn) { _ in
+            Text(entry.content)
+          }
         }
       }
       .frame(maxWidth: .infinity, maxHeight: .infinity).padding().background(Color.black)
@@ -37,8 +47,8 @@ struct EntryRow: View {
     )
     .simultaneousGesture(
       LongPressGesture(minimumDuration: 1).onEnded { _ in
-          secondaryAction()
-        }
+        secondaryAction()
+      }
     )
     .highPriorityGesture(
       TapGesture().onEnded { _ in

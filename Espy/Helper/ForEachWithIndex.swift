@@ -8,6 +8,7 @@
 import Foundation
 import SwiftUI
 
+
 public struct ForEachWithIndex<Data: RandomAccessCollection, ID: Hashable, Content: View>: View {
     public var data: Data
     public var content: (_ index: Data.Index, _ element: Data.Element) -> Content
@@ -19,6 +20,7 @@ public struct ForEachWithIndex<Data: RandomAccessCollection, ID: Hashable, Conte
         self.content = content
     }
 
+    @ViewBuilder
     public var body: some View {
         ForEach(
             zip(self.data.indices, self.data).map { index, element in
