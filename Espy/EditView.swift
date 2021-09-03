@@ -26,7 +26,7 @@ struct EditView: View {
 
   init(file: URL) {
     self.init()
-    if let entry = LocalManager.shared.getEntry(for: file) {
+    if let entry = LocalManager.shared.getLocalEntry(with: file) {
       self.selectedIndex = entry.index
       self.selectedEntry = entry
 
@@ -62,7 +62,7 @@ struct EditView: View {
         let entry = Entry(entry: selectedEntry, content: fullText)
 
         if isNew {
-          LocalManager.shared.addNewEntryFileFor(entry)
+          LocalManager.shared.createFileFor(entry)
         } else if isTextUpdated {
           LocalManager.shared.updateEntryFile(selectedEntry, new: entry, at: selectedIndex)
         }

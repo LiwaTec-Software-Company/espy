@@ -81,12 +81,17 @@ struct ContentView: View {
       }
       .navigationTitle("Board")
       .toolbar {
-        ToolbarItem(placement: .primaryAction) {
+        ToolbarItem(placement: .destructiveAction) {
+          HStack{
             Button(action: {
               deleteAllSelectedEntries()
             }, label: {
-                Image(systemName: "trash")
+              Image(systemName: "trash")
+                .font(Font.system(size: isMultiSelectOn ? 25 : 15))
+                .foregroundColor(isMultiSelectOn ? .red : .gray)
+              Text("")
             })
+          }
         }
 
         ToolbarItemGroup(placement: .bottomBar) {

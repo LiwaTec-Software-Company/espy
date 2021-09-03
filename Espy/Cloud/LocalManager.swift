@@ -41,7 +41,6 @@ class LocalManager {
     return fileManager.fileExists(atPath: filePath)
   }
 
-  // Delete All files at URL
   func deleteFilesInDirectory(url: URL?) {
     let enumerator = fileManager.enumerator(atPath: url!.path)
     while let file = enumerator?.nextObject() as? String {
@@ -70,7 +69,7 @@ class LocalManager {
     }
   }
 
-  func fileModificationDate(url: URL) -> Date? {
+  func getFileModificationDate(url: URL) -> Date? {
       do {
           let attr = try fileManager.attributesOfItem(atPath: url.path)
           return attr[FileAttributeKey.modificationDate] as? Date
@@ -80,10 +79,10 @@ class LocalManager {
   }
 }
 
-// MARK - Entry
+// MARK - EntryManager
 extension LocalManager {
   // CREATE
-  func addNewEntryFileFor(_ entry: Entry, at index: Int = 0) {
+  func createFileFor(_ entry: Entry, at index: Int = 0) {
     let fileURL = getDocumentDiretoryURL().appendingPathComponent("\(entry.formattedStringDate).md")
 
     do {
@@ -98,9 +97,9 @@ extension LocalManager {
   }
 
   // READ
-  func getEntry(for entryFile: URL) -> Entry? {
+  func getLocalEntry(with file: URL) -> Entry? {
     for (entry, entryFilePath) in entryFiles {
-      if entryFilePath == entryFile.path {
+      if entryFilePath == file.path {
         return entry
       }
     }
@@ -108,7 +107,7 @@ extension LocalManager {
     return nil
   }
   
-  func getEntry(from filePath: String) -> Entry? {
+  func getLocalEntry(with filePath: String) -> Entry? {
     for (entry, entryFilePath) in entryFiles {
       if entryFilePath == filePath {
         return entry
@@ -117,14 +116,14 @@ extension LocalManager {
     return nil
   }
 
-  func getEntryInDirectory(from file: URL) -> Entry? {
-    if let entry = getEntry(for: file) {
+  func getEntry(from file: URL) -> Entry? {
+    if let entry = getLocalEntry(with: file) {
       return entry
     }
 
     if !file.lastPathComponent.contains(".md") { return  nil }
     let fileName = file.deletingPathExtension().lastPathComponent
-    let lastUpdated = fileModificationDate(url: file)
+    let lastUpdated = getFileModificationDate(url: file)
 
     do {
       let content = try String(contentsOf: file, encoding: .utf8)
@@ -152,19 +151,21 @@ extension LocalManager {
 
   // UPDATE
   func loadAllEntryFiles() {
+    var entries = [Entry]()
     do {
       let files = try FileManager.default.contentsOfDirectory(at: getDocumentDiretoryURL(), includingPropertiesForKeys: nil)
 
       for (index, file) in files.enumerated() {
         if !file.lastPathComponent.contains(".md") { continue }
-        guard var entry = getEntryInDirectory(from: file) else { continue }
+        guard var entry = getEntry(from: file) else { continue }
         entry.setIndex(index)
         entryFiles[entry] = file.path
-        EntryManager.shared.entries.append(entry)
+        entries.append(entry)
       }
     } catch {
       print("Unable to get entires from directory.")
     }
+    EntryManager.shared.entries = entries
   }
 
   func updateEntryFile(_ oldEntry: Entry,  new entry: Entry, at index: Int) {
@@ -176,7 +177,7 @@ extension LocalManager {
       EntryManager.shared.entries.remove(at: index)
     }
 
-    addNewEntryFileFor(entry)
+    createFileFor(entry)
   }
 
   // DESTROY
