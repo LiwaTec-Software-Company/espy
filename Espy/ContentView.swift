@@ -10,7 +10,7 @@ import MarkdownUI
 
 class ContentManager: ObservableObject {
   @Published var isMultiSelectOn: Bool = false
-  @Published var isMarkdownEnabled: Bool = false
+  @Published var isEditModeOn: Bool = false
   @Published var entriesSelected: [Entry] = []
 
   var isAnythingSelected: Bool {
@@ -60,12 +60,17 @@ struct EntryRow: View {
             Text(entry.lastUpdated.shortString())
               .font(.caption).foregroundColor(.gray)
           }
-          let contentLines = entry.content.split(separator: "\n")
-          LazyVStack {
-            ForEach(contentLines, id: \.self, content: { line in
-              Text(line).foregroundColor(.primary).disabled(false)
-            }).if(!contentManager.isMarkdownEnabled) { _ in
-              Text(entry.content).foregroundColor(.primary)
+          let markdownLines: [MarkdownLine] = entry.content.components(separatedBy: .newlines).map { line in
+            return MarkdownLine(line: line)
+          }
+
+          if contentManager.isEditModeOn {
+            Text(entry.content)
+          } else {
+            Group {
+              ForEach(markdownLines, id: \.self) { (markdownLine: MarkdownLine) in
+                markdownLine
+              }
             }
           }
         }
@@ -190,6 +195,8 @@ struct ContentView: View {
               } else {
                 contentManager.isMultiSelectOn.toggle()
               }
+
+              contentManager.isEditModeOn.toggle()
             }, label: {
               Image(systemName: contentManager.isMultipleSelected ? "tag.fill" : "tag")
                 .font(Font.system(size: 25))
@@ -242,9 +249,6 @@ struct ContentView: View {
       }
     }
     .environmentObject(contentManager)
-    .onTapGesture(count: 2) {
-      contentManager.isMarkdownEnabled.toggle()
-    }
   }
 
   func onDelete(at offsets: IndexSet) {
@@ -283,5 +287,23 @@ struct ContentView: View {
 struct ContentView_Previews: PreviewProvider {
   static var previews: some View {
     ContentView()
+  }
+}
+
+
+struct MarkdownLine: View, Identifiable, Hashable {
+  @State var line: String = ""
+  let id: UUID = UUID()
+
+  var body: some View {
+    Markdown("\(line)")
+  }
+
+  static func == (lhs: MarkdownLine, rhs: MarkdownLine) -> Bool {
+    return lhs.id == rhs.id && lhs.line == rhs.line
+  }
+
+  func hash(into hasher: inout Hasher) {
+      hasher.combine(id)
   }
 }

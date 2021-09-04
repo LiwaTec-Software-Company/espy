@@ -9,12 +9,8 @@ import Foundation
 import SwiftUI
 
 extension View {
-   @ViewBuilder
-   func `if`<Content: View>(_ conditional: Bool, content: (Self) -> Content) -> some View {
-        if conditional {
-            content(self)
-        } else {
-            self
-        }
-    }
+  func Print(_ vars: Any...) -> some View {
+    for v in vars { print(v) }
+    return EmptyView()
+  }
 }
