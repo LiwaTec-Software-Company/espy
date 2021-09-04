@@ -15,6 +15,7 @@
 		3D699A2E26DF1CE400E9755E /* DocumentPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D699A2D26DF1CE400E9755E /* DocumentPicker.swift */; };
 		3D95EA2626E1B5D300B72D86 /* MarkdownUI in Frameworks */ = {isa = PBXBuildFile; productRef = 3D95EA2526E1B5D300B72D86 /* MarkdownUI */; };
 		3D95EA2826E1C46700B72D86 /* View+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D95EA2726E1C46700B72D86 /* View+Extensions.swift */; };
+		3D95EA2A26E2F10000B72D86 /* UIImage+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D95EA2926E2F10000B72D86 /* UIImage+Extensions.swift */; };
 		3DE8537626DC774400D5E146 /* EspyApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DE8537526DC774400D5E146 /* EspyApp.swift */; };
 		3DE8537826DC774400D5E146 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DE8537726DC774400D5E146 /* ContentView.swift */; };
 		3DE8537A26DC774A00D5E146 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3DE8537926DC774A00D5E146 /* Assets.xcassets */; };
@@ -54,6 +55,7 @@
 		3D699A2B26DEE21F00E9755E /* ForEachWithIndex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForEachWithIndex.swift; sourceTree = "<group>"; };
 		3D699A2D26DF1CE400E9755E /* DocumentPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentPicker.swift; sourceTree = "<group>"; };
 		3D95EA2726E1C46700B72D86 /* View+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Extensions.swift"; sourceTree = "<group>"; };
+		3D95EA2926E2F10000B72D86 /* UIImage+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImage+Extensions.swift"; sourceTree = "<group>"; };
 		3DE8537226DC774400D5E146 /* Espy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Espy.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3DE8537526DC774400D5E146 /* EspyApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EspyApp.swift; sourceTree = "<group>"; };
 		3DE8537726DC774400D5E146 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -182,6 +184,7 @@
 				3D699A2B26DEE21F00E9755E /* ForEachWithIndex.swift */,
 				3D699A2D26DF1CE400E9755E /* DocumentPicker.swift */,
 				3D95EA2726E1C46700B72D86 /* View+Extensions.swift */,
+				3D95EA2926E2F10000B72D86 /* UIImage+Extensions.swift */,
 			);
 			path = Helper;
 			sourceTree = "<group>";
@@ -345,6 +348,7 @@
 				3DE853AA26DD710700D5E146 /* Entry.swift in Sources */,
 				3D95EA2826E1C46700B72D86 /* View+Extensions.swift in Sources */,
 				3DE853AE26DD714200D5E146 /* TimeInterval+Extensions.swift in Sources */,
+				3D95EA2A26E2F10000B72D86 /* UIImage+Extensions.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

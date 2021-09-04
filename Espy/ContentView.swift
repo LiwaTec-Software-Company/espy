@@ -8,14 +8,47 @@
 import SwiftUI
 import MarkdownUI
 
+class ContentManager: ObservableObject {
+  @Published var isMultiSelectOn: Bool = false
+  @Published var isMarkdownEnabled: Bool = false
+  @Published var entriesSelected: [Entry] = []
+
+  var isAnythingSelected: Bool {
+    get {
+      entriesSelected.count > 0
+    }
+  }
+
+  var isMultipleSelected: Bool {
+    get {
+      entriesSelected.count > 1
+    }
+  }
+
+  var isEverythingSelected: Bool {
+    get {
+      entriesSelected.count == EntryManager.shared.entries.count
+    }
+  }
+
+  func isEntrySelected(_ entry: Entry) -> Bool {
+    return entriesSelected.contains(entry)
+  }
+}
+
 struct EntryRow: View {
-  @Binding var isMultiSelectOn: Bool
+  @EnvironmentObject var contentManager: ContentManager
+
   var entry: Entry
-  var isSelected: Bool = false
   var action: () -> Void
   var secondaryAction: () -> Void
 
-  @ViewBuilder
+  var isSelected: Bool {
+    get {
+      contentManager.isEntrySelected(entry)
+    }
+  }
+
   var body: some View {
     Button(action: {}) {
       HStack {
@@ -27,15 +60,13 @@ struct EntryRow: View {
             Text(entry.lastUpdated.shortString())
               .font(.caption).foregroundColor(.gray)
           }
-//          Text(entry.content).foregroundColor(.primary)
           let contentLines = entry.content.split(separator: "\n")
           LazyVStack {
-            ForEachWithIndex(contentLines, id: \.self) { index, line in
-              Markdown("\(line)").disabled(true)
+            ForEach(contentLines, id: \.self, content: { line in
+              Text(line).foregroundColor(.primary).disabled(false)
+            }).if(!contentManager.isMarkdownEnabled) { _ in
+              Text(entry.content).foregroundColor(.primary)
             }
-          }
-          .if(isMultiSelectOn) { _ in
-            Text(entry.content)
           }
         }
       }
@@ -43,7 +74,7 @@ struct EntryRow: View {
     }
     .overlay(
       RoundedRectangle(cornerRadius: 10)
-        .stroke(isSelected ? Color.accentColor : Color.gray, lineWidth: isSelected ? 4 : isMultiSelectOn ? 1 : 0)
+        .stroke(isSelected ? Color.accentColor : Color.gray, lineWidth: isSelected ? 4 : contentManager.isMultiSelectOn ? 1 : 0)
     )
     .simultaneousGesture(
       LongPressGesture(minimumDuration: 1).onEnded { _ in
@@ -59,55 +90,110 @@ struct EntryRow: View {
 }
 
 struct ContentView: View {
+  @StateObject var contentManager: ContentManager = ContentManager()
   @ObservedObject private var entryManager = EntryManager.shared
+
   @State private var isShowingEntrySheet = false
   @State private var isShowingBottomSheet = true
   @State private var isShowingDocSheet = false
   @State private var isShowingDocEntrySheet = false
 
   @State var editViewFromDocSheet: EditView?
-  @State var entriesSelected: [Entry] = []
-  @State var isMultiSelectOn: Bool = true
+
+  var isMultiSelectOn: Bool {
+    get {
+      contentManager.isMultiSelectOn
+    }
+  }
+
+  init() {
+    let barBackgroundImage = UIImage(color: UIColor(hue: 0, saturation: 1, brightness: 0, alpha: 0.7))
+    UINavigationBar.appearance().barTintColor = .clear
+    UINavigationBar.appearance().setBackgroundImage(barBackgroundImage, for: .default)
+    UIToolbar.appearance().barTintColor = .clear
+    UIToolbar.appearance().setBackgroundImage(barBackgroundImage, forToolbarPosition: .any, barMetrics: .default)
+  }
 
   var body: some View {
     NavigationView {
       ScrollView {
         LazyVStack {
           ForEachWithIndex(entryManager.entries) { (index: Int, entry: Entry) in
-            EntryRow(isMultiSelectOn: $isMultiSelectOn, entry: entry, isSelected: self.entriesSelected.contains(entry), action: {
-              if isMultiSelectOn {
+            EntryRow(entry: entry, action: {
+              if contentManager.isMultiSelectOn {
                 selectRow(with: entry)
               } else {
                 isShowingEntrySheet.toggle()
               }
             }, secondaryAction: {
-              self.isMultiSelectOn.toggle()
+              contentManager.isMultiSelectOn.toggle()
             })
-            .padding(isMultiSelectOn ? 10 : 0)
+            .padding(contentManager.isMultiSelectOn ? 10 : 0)
             .sheet(isPresented: $isShowingEntrySheet) {
               EditView(index: index)
             }
           }
-          .onDelete(perform: delete)
+          .onDelete(perform: onDelete)
+          .onMove(perform: onMove)
         }
       }
       .onAppear {
         LocalManager.shared.loadAllEntryFiles()
         isShowingBottomSheet = true
       }
-      .navigationTitle("Board")
       .toolbar {
         ToolbarItem(placement: .destructiveAction) {
           HStack{
             Button(action: {
-              if isMultiSelectOn {
+              if contentManager.isMultiSelectOn {
                 deleteAllSelectedEntries()
+
+                contentManager.isMultiSelectOn.toggle()
               }
-              isMultiSelectOn.toggle()
             }, label: {
-              Image(systemName: "trash")
-                .font(Font.system(size: isMultiSelectOn ? 25 : 15))
-                .foregroundColor(isMultiSelectOn ? .red : .gray)
+              Image(systemName: contentManager.isAnythingSelected ? "trash.fill": "trash")
+                .font(Font.system(size: contentManager.isMultiSelectOn ? 25 : 20))
+                .foregroundColor(contentManager.isAnythingSelected ? .red : .gray)
+              Text("")
+            }).disabled(!contentManager.isMultiSelectOn)
+          }
+        }
+
+        ToolbarItem(placement: .principal) {
+          HStack{
+            Button(action: {
+              if contentManager.isEverythingSelected && contentManager.isMultiSelectOn {
+                contentManager.isMultiSelectOn.toggle()
+                selectAllRows()
+              } else if contentManager.isMultiSelectOn {
+                selectAllRows()
+              } else {
+                contentManager.isMultiSelectOn.toggle()
+              }
+            }, label: {
+              Image(systemName: (contentManager.isEverythingSelected && contentManager.isMultiSelectOn) ? "xmark.circle.fill" : contentManager.isMultiSelectOn ? "rectangle.grid.1x2.fill" : "rectangle.grid.1x2")
+                .font(Font.system(size: 25))
+                .foregroundColor(.accentColor)
+              Text("")
+            })
+          }
+        }
+
+        ToolbarItem(placement: .navigationBarLeading) {
+          HStack{
+            Button(action: {
+              if contentManager.isEverythingSelected && contentManager.isMultiSelectOn {
+                contentManager.isMultiSelectOn.toggle()
+                selectAllRows()
+              } else if contentManager.isMultiSelectOn {
+                selectAllRows()
+              } else {
+                contentManager.isMultiSelectOn.toggle()
+              }
+            }, label: {
+              Image(systemName: contentManager.isMultipleSelected ? "tag.fill" : "tag")
+                .font(Font.system(size: 25))
+                .foregroundColor(.accentColor)
               Text("")
             })
           }
@@ -125,7 +211,6 @@ struct ContentView: View {
             }.onDisappear {
               LocalManager.shared.loadAllEntryFiles()
             }
-
           }).sheet(isPresented: $isShowingDocEntrySheet) {
             if let editView = editViewFromDocSheet {
               editView.onDisappear {
@@ -151,30 +236,46 @@ struct ContentView: View {
           Button(action: {
             print("Edit button was tapped")
           }) {
-            Image(systemName: "paperplane")
+            Image(systemName: contentManager.isMultipleSelected ? "paperplane.fill" : "paperplane")
           }
         }
       }
     }
+    .environmentObject(contentManager)
+    .onTapGesture(count: 2) {
+      contentManager.isMarkdownEnabled.toggle()
+    }
   }
 
-  func delete(at offsets: IndexSet) {
+  func onDelete(at offsets: IndexSet) {
     // preserve all ids to be deleted to avoid indices confusing
     let entriesToDelete = offsets.map { entryManager.entries[$0] }
     LocalManager.shared.deleteEntryFiles(entriesToDelete)
   }
 
+  private func onMove(source: IndexSet, destination: Int) {
+    entryManager.entries.move(fromOffsets: source, toOffset: destination)
+  }
+
   func deleteAllSelectedEntries() {
-    LocalManager.shared.deleteEntryFiles(entriesSelected)
-    entriesSelected.removeAll()
+    LocalManager.shared.deleteEntryFiles(contentManager.entriesSelected)
+    contentManager.entriesSelected.removeAll()
   }
 
   func selectRow(with entry: Entry) {
-    if self.entriesSelected.contains(entry) {
-      self.entriesSelected.removeAll(where: { $0 == entry })
+    if contentManager.entriesSelected.contains(entry) {
+      contentManager.entriesSelected.removeAll(where: { $0 == entry })
     }
     else {
-      self.entriesSelected.append(entry)
+      contentManager.entriesSelected.append(entry)
+    }
+  }
+
+  func selectAllRows() {
+    if contentManager.entriesSelected.count == entryManager.entries.count {
+      contentManager.entriesSelected.removeAll()
+    } else {
+      contentManager.entriesSelected = EntryManager.shared.entries
     }
   }
 }
