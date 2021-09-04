@@ -9,6 +9,7 @@ import SwiftUI
 import MarkdownUI
 
 class ContentManager: ObservableObject {
+  static let shared = ContentManager()
   @Published var isMultiSelectOn: Bool = false
   @Published var isEditModeOn: Bool = false
   @Published var entriesSelected: [Entry] = []
@@ -27,12 +28,35 @@ class ContentManager: ObservableObject {
 
   var isEverythingSelected: Bool {
     get {
-      entriesSelected.count == EntryManager.shared.entries.count
+      entriesSelected.count == EntryManager.shared.entryMap.count
     }
   }
 
   func isEntrySelected(_ entry: Entry) -> Bool {
     return entriesSelected.contains(entry)
+  }
+
+  func toggleSelect(_ entry: Entry) {
+    if entriesSelected.contains(entry) {
+      entriesSelected.removeAll(where: { $0 == entry })
+    }
+    else {
+      entriesSelected.append(entry)
+    }
+  }
+
+  func unselectAll() {
+    entriesSelected.removeAll()
+  }
+
+  func unselect(_ entry: Entry) {
+    entriesSelected.removeAll(where: { $0 == entry })
+  }
+
+  func select(_ entry: Entry) {
+    if !entriesSelected.contains(entry) {
+      entriesSelected.append(entry)
+    }
   }
 }
 
@@ -108,10 +132,10 @@ struct EntryRow: View {
         .stroke(isSelected ? Color.accentColor : Color.gray, lineWidth: isSelected ? 4 : contentManager.isMultiSelectOn ? 1 : 0)
     )
     .offset(
-        x: viewState.width + translation.width,
-        y: viewState.height + translation.height
+      x: viewState.width + translation.width,
+      y: viewState.height + translation.height
     )
-//    .gesture(magnificationAndDragGesture).rotationEffect(Angle(degrees: degrees)).scaleEffect(scale).animation(.easeInOut)
+    //    .gesture(magnificationAndDragGesture).rotationEffect(Angle(degrees: degrees)).scaleEffect(scale).animation(.easeInOut)
   }
 }
 
@@ -126,18 +150,16 @@ struct TrashButton: View {
         onPress()
       }, label: {
         Image(systemName: contentManager.isAnythingSelected ? "trash.fill": "trash")
-          .font(Font.system(size: contentManager.isMultiSelectOn ? 25 : 20))
+          .font(Font.system(size: (contentManager.isAnythingSelected || contentManager.isMultiSelectOn) ? 25 : 20))
           .foregroundColor(contentManager.isAnythingSelected ? .red : .gray)
         Text("")
-      }).disabled(!contentManager.isMultiSelectOn)
+      }).disabled(!(contentManager.isMultiSelectOn || contentManager.isAnythingSelected ))
     }
   }
 }
 
-struct MarkdownModeButton: View {
+struct EditModeButton: View {
   @EnvironmentObject var contentManager: ContentManager
-
-  var onPress: () -> Void
 
   var body: some View {
     HStack{
@@ -174,13 +196,27 @@ struct BlockModeButton: View {
 }
 
 struct ContentView: View {
-  @StateObject var contentManager: ContentManager = ContentManager()
+  @ObservedObject var contentManager: ContentManager = ContentManager.shared
   @ObservedObject private var entryManager = EntryManager.shared
 
   @State private var isShowingEntrySheet = false
   @State private var isShowingBottomSheet = true
   @State private var isShowingDocSheet = false
   @State private var isShowingDocEntrySheet = false
+
+  @State private var currentEntry: Entry?
+
+  private var canShowSheetForEntry: Binding<Bool> {
+    Binding (
+      get: {
+        if let currentEntry = currentEntry {
+         return isShowingDocSheet && contentManager.isEntrySelected(currentEntry)
+        }
+        return false
+      },
+      set: { $0 }
+    )
+  }
 
   @State var editViewFromDocSheet: EditView?
 
@@ -201,12 +237,12 @@ struct ContentView: View {
   var body: some View {
     NavigationView {
       ScrollView {
-        LazyVStack {
-          ForEachWithIndex(entryManager.entries) { (index: Int, entry: Entry) in
+        VStack {
+          ForEach(entryManager.entryMap.sorted(by: {$0.key > $1.key}), id: \.value) { entry, id in
             EntryRow(entry: entry, action: {
-              if contentManager.isMultiSelectOn {
-                selectRow(with: entry)
-              } else {
+              selectRow(with: entry)
+              if !contentManager.isMultiSelectOn {
+                currentEntry = entry
                 isShowingEntrySheet.toggle()
               }
             }, secondaryAction: {
@@ -215,12 +251,11 @@ struct ContentView: View {
               contentManager.isEditModeOn.toggle()
             })
             .padding(contentManager.isMultiSelectOn ? 10 : 0)
-            .sheet(isPresented: $isShowingEntrySheet) {
-              EditView(index: index)
+            .sheet(item: $currentEntry) { entry in
+              EditView(entry).onDisappear(perform: unselectAllRows)
             }
           }
           .onDelete(perform: onDelete)
-          .onMove(perform: onMove)
         }
       }
       .onAppear {
@@ -251,9 +286,7 @@ struct ContentView: View {
         }
 
         ToolbarItem(placement: .navigationBarLeading) {
-          MarkdownModeButton(onPress: {
-
-          })
+          EditModeButton()
         }
 
         ToolbarItemGroup(placement: .bottomBar) {
@@ -273,6 +306,7 @@ struct ContentView: View {
               editView.onDisappear {
                 self.editViewFromDocSheet = nil
                 isShowingDocSheet = false
+                unselectAllRows()
               }
             }
           }
@@ -285,7 +319,9 @@ struct ContentView: View {
                 .font(.system(size: 44.0, weight: .bold))
             }
             .sheet(isPresented: $isShowingBottomSheet) {
-              EditView()
+              EditView().onDisappear {
+                unselectAllRows()
+              }
             }
             Text("")
           }
@@ -304,33 +340,29 @@ struct ContentView: View {
   func onDelete(at offsets: IndexSet) {
     // preserve all ids to be deleted to avoid indices confusing
     let entriesToDelete = offsets.map { entryManager.entries[$0] }
-    LocalManager.shared.deleteEntryFiles(entriesToDelete)
-  }
-
-  private func onMove(source: IndexSet, destination: Int) {
-    entryManager.entries.move(fromOffsets: source, toOffset: destination)
+    LocalManager.shared.deleteEntriesAndFiles(entriesToDelete)
   }
 
   func deleteAllSelectedEntries() {
-    LocalManager.shared.deleteEntryFiles(contentManager.entriesSelected)
+    LocalManager.shared.deleteEntriesAndFiles(contentManager.entriesSelected)
     contentManager.entriesSelected.removeAll()
   }
 
   func selectRow(with entry: Entry) {
-    if contentManager.entriesSelected.contains(entry) {
-      contentManager.entriesSelected.removeAll(where: { $0 == entry })
-    }
-    else {
-      contentManager.entriesSelected.append(entry)
-    }
+    contentManager.toggleSelect(entry)
   }
+  
 
   func selectAllRows() {
-    if contentManager.entriesSelected.count == entryManager.entries.count {
+    if contentManager.entriesSelected.count == entryManager.entryMap.count {
       contentManager.entriesSelected.removeAll()
     } else {
       contentManager.entriesSelected = EntryManager.shared.entries
     }
+  }
+
+  func unselectAllRows() {
+    contentManager.entriesSelected.removeAll()
   }
 }
 
@@ -354,6 +386,6 @@ struct MarkdownLine: View, Identifiable, Hashable {
   }
 
   func hash(into hasher: inout Hasher) {
-      hasher.combine(id)
+    hasher.combine(id)
   }
 }

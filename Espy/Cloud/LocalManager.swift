@@ -16,7 +16,7 @@ struct DocumentsDirectory {
 class LocalManager {
   static let shared = LocalManager()
 
-  var entryFiles: [Entry: String] = [Entry: String]()
+  var entryFiles: [UUID: String] = [UUID: String]()
   let fileManager: FileManager!
   
   init() {
@@ -82,7 +82,7 @@ class LocalManager {
 // MARK - EntryManager
 extension LocalManager {
   // CREATE
-  func createFileFor(_ entry: Entry, at index: Int = 0) {
+  func createFileFor(_ entry: Entry) {
     let fileURL = getDocumentDiretoryURL().appendingPathComponent("\(entry.formattedStringDate).md")
 
     do {
@@ -92,15 +92,15 @@ extension LocalManager {
       print("Unable to add this entry.")
     }
 
-    entryFiles[entry] = fileURL.path
-    EntryManager.shared.entries.insert(entry, at: index)
+    entryFiles[entry.id] = fileURL.path
+    EntryManager.shared.add(entry)
   }
 
   // READ
   func getLocalEntry(with file: URL) -> Entry? {
-    for (entry, entryFilePath) in entryFiles {
+    for (entryId, entryFilePath) in entryFiles {
       if entryFilePath == file.path {
-        return entry
+        return EntryManager.shared.getEntry(with: entryId)
       }
     }
     
@@ -108,9 +108,9 @@ extension LocalManager {
   }
   
   func getLocalEntry(with filePath: String) -> Entry? {
-    for (entry, entryFilePath) in entryFiles {
+    for (entryId, entryFilePath) in entryFiles {
       if entryFilePath == filePath {
-        return entry
+        return EntryManager.shared.getEntry(with: entryId)
       }
     }
     return nil
@@ -155,42 +155,45 @@ extension LocalManager {
     do {
       let files = try FileManager.default.contentsOfDirectory(at: getDocumentDiretoryURL(), includingPropertiesForKeys: nil)
 
-      for (index, file) in files.enumerated() {
+      for file in files {
         if !file.lastPathComponent.contains(".md") { continue }
-        guard var entry = getEntry(from: file) else { continue }
-        entry.setIndex(index)
-        entryFiles[entry] = file.path
+        guard let entry = getEntry(from: file) else { continue }
+        entryFiles[entry.id] = file.path
         entries.append(entry)
       }
     } catch {
       print("Unable to get entires from directory.")
     }
-    EntryManager.shared.entries = entries
+    EntryManager.shared.add(entries)
   }
 
-  func updateEntryFile(_ oldEntry: Entry,  new entry: Entry, at index: Int) {
-    guard let entryFilePath = entryFiles[oldEntry] else { return }
+  func updateEntryAndFile(with id: UUID) {
+    guard let entry = EntryManager.shared.getEntry(with: id) else { return }
+    guard let entryFilePath = entryFiles[id] else { return }
 
     if doesFileExist(entryFilePath) {
       deleteFile(filePath: entryFilePath)
-      deleteEntryFile(oldEntry)
-      EntryManager.shared.entries.remove(at: index)
+      deleteEntryAndFile(with: id)
     }
 
     createFileFor(entry)
   }
 
   // DESTROY
-  func deleteEntryFile(_ entry: Entry) {
-    guard let entryIndex = entryFiles.index(forKey: entry) else { return }
-    let deleteMe = entryFiles.remove(at: entryIndex)
-    EntryManager.shared.removeEntry(entry)
-    deleteFile(filePath: deleteMe.value)
+  func deleteEntryAndFile(_ entry: Entry) {
+    deleteEntryAndFile(with: entry.id)
   }
 
-  func deleteEntryFiles(_ entries: [Entry]) {
+  func deleteEntryAndFile(with id: UUID) {
+    guard let idIndex = entryFiles.index(forKey: id) else { return }
+    let toDelete = entryFiles.remove(at: idIndex)
+    EntryManager.shared.removeEntry(with: id)
+    deleteFile(filePath: toDelete.value)
+  }
+
+  func deleteEntriesAndFiles(_ entries: [Entry]) {
     for entry in entries {
-      self.deleteEntryFile(entry)
+      self.deleteEntryAndFile(entry)
     }
   }
 }

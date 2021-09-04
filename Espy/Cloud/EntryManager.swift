@@ -7,18 +7,67 @@
 
 import Foundation
 
+typealias EntryMap = [Entry: UUID]
+
+
+func ==(lhs: EntryMap, rhs: EntryMap) -> Bool {
+    return NSDictionary(dictionary: lhs).isEqual(to: rhs)
+}
+
+func >(lhs: EntryMap, rhs: EntryMap ) -> Bool {
+  return lhs.count > rhs.count
+}
+
+func <(lhs: EntryMap, rhs: EntryMap ) -> Bool {
+  return lhs.count < rhs.count
+}
+
 class EntryManager: ObservableObject  {
   static let shared = EntryManager()
-  @Published var entries = [Entry]()
+  @Published var entryMap = EntryMap()
 
-  func removeEntry(_ entry: Entry) {
-    guard let index = entries.firstIndex(of: entry) else { return }
-    entries.remove(at: index)
+  var entries: [Entry] {
+    get {
+      Array(entryMap.keys)
+    }
   }
 
-  func removeEntries(_ entries: [Entry]) {
+  func add(_ entry: Entry) {
+    entryMap[entry] = entry.id
+  }
+
+  func add(_ entries: [Entry]) {
     for entry in entries {
-      removeEntry(entry)
+      add(entry)
+    }
+  }
+
+  func getEntry(with id: UUID) -> Entry? {
+    return entryMap.key(forValue: id)
+  }
+
+  func remove(_ entry: Entry) {
+    guard let index = entryMap.index(forKey: entry) else { return }
+    entryMap.remove(at: index)
+  }
+
+  func removeEntry(with id: UUID) {
+    guard let entry = entryMap.key(forValue: id) else { return }
+    guard let index = entryMap.index(forKey: entry) else { return }
+    entryMap.remove(at: index)
+  }
+
+  func remove(_ entries: [Entry]) {
+    for entry in entries {
+      remove(entry)
     }
   }
 }
+
+extension Dictionary where Value: Equatable {
+    func key(forValue value: Value) -> Key? {
+        return first { $0.1 == value }?.0
+    }
+}
+
+

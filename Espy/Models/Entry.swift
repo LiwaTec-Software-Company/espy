@@ -8,11 +8,9 @@
 
 import Foundation
 
-struct Entry: Identifiable, Hashable {
+struct Entry {
   /// Unique id of the entry which is basically the date down to seconds.
   var id: UUID
-  /// Index in CloudManager
-  var index: Int = 0
   /// The date the entry was entered.
   var date: Date
   /// Date this entry was updated by the user.
@@ -71,11 +69,15 @@ struct Entry: Identifiable, Hashable {
     self.content = content
   }
 
-  mutating func setIndex(_ index: Int) {
-    self.index = index
-  }
-
   mutating func setLastUpdated(_ date: Date) {
     self.lastUpdated = date
+  }
+}
+
+extension Entry: Identifiable, Hashable {
+}
+extension Entry: Comparable {
+  static func < (lhs: Entry, rhs: Entry) -> Bool {
+    return lhs.date < rhs.date  && lhs.lastUpdated < rhs.lastUpdated
   }
 }
