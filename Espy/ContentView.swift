@@ -42,6 +42,7 @@ struct EntryRow: View {
   var entry: Entry
   var action: () -> Void
   var secondaryAction: () -> Void
+  var thirdAction: () -> Void
 
   var isSelected: Bool {
     get {
@@ -49,7 +50,31 @@ struct EntryRow: View {
     }
   }
 
+  @State private var degrees: Double = 0
+  @State private var scale: CGFloat = 1.0
+  @State private var viewState = CGSize.zero
+  @State private var translation: CGSize = .zero
+  @State private var canBeDragged: Bool = true
+
   var body: some View {
+    // tap > dtap > long
+    let longTapGesture = LongPressGesture(minimumDuration: 0.5).onEnded { _ in
+      secondaryAction()
+    }
+    
+    let doubleTapGesture = TapGesture(count: 2).onEnded { _ in
+      thirdAction()
+    }
+
+
+    let tapGesture = TapGesture().onEnded { _ in
+      action()
+    }
+
+    let longAndTap = tapGesture.exclusively(before: longTapGesture)
+
+    let tapBeforeDoubleGesture = longAndTap.sequenced(before: doubleTapGesture)
+
     Button(action: {}) {
       HStack {
         VStack(alignment: .leading, spacing: 2) {
@@ -76,21 +101,75 @@ struct EntryRow: View {
         }
       }
       .frame(maxWidth: .infinity, maxHeight: .infinity).padding().background(Color.black)
+      .gesture(tapBeforeDoubleGesture)
     }
     .overlay(
       RoundedRectangle(cornerRadius: 10)
         .stroke(isSelected ? Color.accentColor : Color.gray, lineWidth: isSelected ? 4 : contentManager.isMultiSelectOn ? 1 : 0)
     )
-    .simultaneousGesture(
-      LongPressGesture(minimumDuration: 1).onEnded { _ in
-        secondaryAction()
-      }
+    .offset(
+        x: viewState.width + translation.width,
+        y: viewState.height + translation.height
     )
-    .highPriorityGesture(
-      TapGesture().onEnded { _ in
-        action()
-      }
-    )
+//    .gesture(magnificationAndDragGesture).rotationEffect(Angle(degrees: degrees)).scaleEffect(scale).animation(.easeInOut)
+  }
+}
+
+struct TrashButton: View {
+  @EnvironmentObject var contentManager: ContentManager
+
+  var onPress: () -> Void
+
+  var body: some View {
+    HStack{
+      Button(action: {
+        onPress()
+      }, label: {
+        Image(systemName: contentManager.isAnythingSelected ? "trash.fill": "trash")
+          .font(Font.system(size: contentManager.isMultiSelectOn ? 25 : 20))
+          .foregroundColor(contentManager.isAnythingSelected ? .red : .gray)
+        Text("")
+      }).disabled(!contentManager.isMultiSelectOn)
+    }
+  }
+}
+
+struct MarkdownModeButton: View {
+  @EnvironmentObject var contentManager: ContentManager
+
+  var onPress: () -> Void
+
+  var body: some View {
+    HStack{
+      Button(action: {
+        contentManager.isEditModeOn.toggle()
+      }, label: {
+        Image(systemName: contentManager.isEditModeOn ? "doc.richtext" : "doc.richtext.fill")
+          .font(Font.system(size: 25))
+          .foregroundColor(.accentColor)
+        Text("")
+      })
+    }
+  }
+}
+
+
+struct BlockModeButton: View {
+  @EnvironmentObject var contentManager: ContentManager
+
+  var onPress: () -> Void
+
+  var body: some View {
+    HStack{
+      Button(action: {
+        onPress()
+      }, label: {
+        Image(systemName: (contentManager.isEverythingSelected && contentManager.isMultiSelectOn) ? "xmark.circle.fill" : contentManager.isMultiSelectOn ? "rectangle.grid.1x2.fill" : "rectangle.grid.1x2")
+          .font(Font.system(size: 25))
+          .foregroundColor(.accentColor)
+        Text("")
+      })
+    }
   }
 }
 
@@ -132,6 +211,8 @@ struct ContentView: View {
               }
             }, secondaryAction: {
               contentManager.isMultiSelectOn.toggle()
+            }, thirdAction: {
+              contentManager.isEditModeOn.toggle()
             })
             .padding(contentManager.isMultiSelectOn ? 10 : 0)
             .sheet(isPresented: $isShowingEntrySheet) {
@@ -148,62 +229,31 @@ struct ContentView: View {
       }
       .toolbar {
         ToolbarItem(placement: .destructiveAction) {
-          HStack{
-            Button(action: {
-              if contentManager.isMultiSelectOn {
-                deleteAllSelectedEntries()
-
-                contentManager.isMultiSelectOn.toggle()
-              }
-            }, label: {
-              Image(systemName: contentManager.isAnythingSelected ? "trash.fill": "trash")
-                .font(Font.system(size: contentManager.isMultiSelectOn ? 25 : 20))
-                .foregroundColor(contentManager.isAnythingSelected ? .red : .gray)
-              Text("")
-            }).disabled(!contentManager.isMultiSelectOn)
-          }
+          TrashButton(onPress: {
+            if contentManager.isMultiSelectOn {
+              deleteAllSelectedEntries()
+              contentManager.isMultiSelectOn.toggle()
+            }
+          })
         }
 
         ToolbarItem(placement: .principal) {
-          HStack{
-            Button(action: {
-              if contentManager.isEverythingSelected && contentManager.isMultiSelectOn {
-                contentManager.isMultiSelectOn.toggle()
-                selectAllRows()
-              } else if contentManager.isMultiSelectOn {
-                selectAllRows()
-              } else {
-                contentManager.isMultiSelectOn.toggle()
-              }
-            }, label: {
-              Image(systemName: (contentManager.isEverythingSelected && contentManager.isMultiSelectOn) ? "xmark.circle.fill" : contentManager.isMultiSelectOn ? "rectangle.grid.1x2.fill" : "rectangle.grid.1x2")
-                .font(Font.system(size: 25))
-                .foregroundColor(.accentColor)
-              Text("")
-            })
-          }
+          BlockModeButton(onPress: {
+            if contentManager.isEverythingSelected && contentManager.isMultiSelectOn {
+              contentManager.isMultiSelectOn.toggle()
+              selectAllRows()
+            } else if contentManager.isMultiSelectOn {
+              selectAllRows()
+            } else {
+              contentManager.isMultiSelectOn.toggle()
+            }
+          })
         }
 
         ToolbarItem(placement: .navigationBarLeading) {
-          HStack{
-            Button(action: {
-              if contentManager.isEverythingSelected && contentManager.isMultiSelectOn {
-                contentManager.isMultiSelectOn.toggle()
-                selectAllRows()
-              } else if contentManager.isMultiSelectOn {
-                selectAllRows()
-              } else {
-                contentManager.isMultiSelectOn.toggle()
-              }
+          MarkdownModeButton(onPress: {
 
-              contentManager.isEditModeOn.toggle()
-            }, label: {
-              Image(systemName: contentManager.isMultipleSelected ? "tag.fill" : "tag")
-                .font(Font.system(size: 25))
-                .foregroundColor(.accentColor)
-              Text("")
-            })
-          }
+          })
         }
 
         ToolbarItemGroup(placement: .bottomBar) {
@@ -296,7 +346,7 @@ struct MarkdownLine: View, Identifiable, Hashable {
   let id: UUID = UUID()
 
   var body: some View {
-    Markdown("\(line)")
+    Markdown("\(line)").disabled(true)
   }
 
   static func == (lhs: MarkdownLine, rhs: MarkdownLine) -> Bool {
