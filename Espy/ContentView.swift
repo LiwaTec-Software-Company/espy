@@ -28,7 +28,7 @@ class ContentManager: ObservableObject {
 
   var isEverythingSelected: Bool {
     get {
-      entriesSelected.count == EntryManager.shared.entryMap.count
+      entriesSelected.count == EntryManager.shared.entryMap.pcount
     }
   }
 
@@ -57,6 +57,10 @@ class ContentManager: ObservableObject {
     if !entriesSelected.contains(entry) {
       entriesSelected.append(entry)
     }
+  }
+
+  func update() {
+    
   }
 }
 
@@ -248,7 +252,7 @@ struct ContentView: View {
             }, secondaryAction: {
               contentManager.isMultiSelectOn.toggle()
             }, thirdAction: {
-              contentManager.isEditModeOn.toggle()
+//              contentManager.isEditModeOn.toggle()
             })
             .padding(contentManager.isMultiSelectOn ? 10 : 0)
             .sheet(item: $currentEntry) { entry in

@@ -28,6 +28,9 @@
 		3DE853AA26DD710700D5E146 /* Entry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DE853A826DD710700D5E146 /* Entry.swift */; };
 		3DE853AD26DD714200D5E146 /* Date+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DE853AB26DD714200D5E146 /* Date+Extensions.swift */; };
 		3DE853AE26DD714200D5E146 /* TimeInterval+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DE853AC26DD714200D5E146 /* TimeInterval+Extensions.swift */; };
+		3DEE0CFA26E52AFE002662C0 /* File.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DEE0CF926E52AFE002662C0 /* File.swift */; };
+		3DEE0CFC26E52F1A002662C0 /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DEE0CFB26E52F1A002662C0 /* Model.swift */; };
+		3DEE0CFE26E569C9002662C0 /* Manager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DEE0CFD26E569C8002662C0 /* Manager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -74,6 +77,9 @@
 		3DE853A826DD710700D5E146 /* Entry.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Entry.swift; sourceTree = "<group>"; };
 		3DE853AB26DD714200D5E146 /* Date+Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Date+Extensions.swift"; sourceTree = "<group>"; };
 		3DE853AC26DD714200D5E146 /* TimeInterval+Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "TimeInterval+Extensions.swift"; sourceTree = "<group>"; };
+		3DEE0CF926E52AFE002662C0 /* File.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = File.swift; sourceTree = "<group>"; };
+		3DEE0CFB26E52F1A002662C0 /* Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Model.swift; sourceTree = "<group>"; };
+		3DEE0CFD26E569C8002662C0 /* Manager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Manager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -126,7 +132,7 @@
 			isa = PBXGroup;
 			children = (
 				3DE853A626DD710700D5E146 /* Models */,
-				3DE853A026DD6DCD00D5E146 /* Cloud */,
+				3DE853A026DD6DCD00D5E146 /* Managers */,
 				3DE853A226DD6DCF00D5E146 /* Helper */,
 				3DE8537526DC774400D5E146 /* EspyApp.swift */,
 				3DE8537726DC774400D5E146 /* ContentView.swift */,
@@ -164,14 +170,15 @@
 			path = EspyUITests;
 			sourceTree = "<group>";
 		};
-		3DE853A026DD6DCD00D5E146 /* Cloud */ = {
+		3DE853A026DD6DCD00D5E146 /* Managers */ = {
 			isa = PBXGroup;
 			children = (
 				3DE853A126DD6DCD00D5E146 /* CloudManager.swift */,
 				3D1A477026E0723900583474 /* LocalManager.swift */,
 				3D1A477226E0724B00583474 /* EntryManager.swift */,
+				3DEE0CFD26E569C8002662C0 /* Manager.swift */,
 			);
-			path = Cloud;
+			path = Managers;
 			sourceTree = "<group>";
 		};
 		3DE853A226DD6DCF00D5E146 /* Helper */ = {
@@ -194,6 +201,8 @@
 			children = (
 				3DE853A726DD710700D5E146 /* User.swift */,
 				3DE853A826DD710700D5E146 /* Entry.swift */,
+				3DEE0CF926E52AFE002662C0 /* File.swift */,
+				3DEE0CFB26E52F1A002662C0 /* Model.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -338,12 +347,15 @@
 				3D1A477326E0724B00583474 /* EntryManager.swift in Sources */,
 				3DE8537826DC774400D5E146 /* ContentView.swift in Sources */,
 				3D29477D26E04C010086CC65 /* EditView.swift in Sources */,
+				3DEE0CFE26E569C9002662C0 /* Manager.swift in Sources */,
 				3D699A2C26DEE21F00E9755E /* ForEachWithIndex.swift in Sources */,
 				3DE853AD26DD714200D5E146 /* Date+Extensions.swift in Sources */,
 				3DE8537626DC774400D5E146 /* EspyApp.swift in Sources */,
 				3D699A2E26DF1CE400E9755E /* DocumentPicker.swift in Sources */,
+				3DEE0CFC26E52F1A002662C0 /* Model.swift in Sources */,
 				3D29477F26E04D5A0086CC65 /* AlphaBackgroundView.swift in Sources */,
 				3DE853A926DD710700D5E146 /* User.swift in Sources */,
+				3DEE0CFA26E52AFE002662C0 /* File.swift in Sources */,
 				3DE853A526DD6DD000D5E146 /* Style.swift in Sources */,
 				3DE853AA26DD710700D5E146 /* Entry.swift in Sources */,
 				3D95EA2826E1C46700B72D86 /* View+Extensions.swift in Sources */,
@@ -435,7 +447,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -490,7 +502,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;

@@ -8,76 +8,53 @@
 
 import Foundation
 
-struct Entry {
-  /// Unique id of the entry which is basically the date down to seconds.
-  var id: UUID
-  /// The date the entry was entered.
-  var date: Date
-  /// Date this entry was updated by the user.
-  var lastUpdated: Date
-  /// The text that was entered by the user.
-  var content: String
-  var inSaveFormat: String {
-    get {
-      return content + "\n\n" + id.uuidString
+struct Entry: Model {
+  typealias T = Entry
+
+  var id: UUID = UUID()
+  var createdAt: Date = Date()
+  var updatedAt: Date = Date()
+  var file: File = File()
+  var contents: String = ""
+
+  init(file: File) {
+    self.createdAt = file.createdAt
+    self.updatedAt = file.updatedAt
+    self.file = file
+    self.contents = file.contents
+    if let idFromFile = file.extractEntryId() {
+      self.id = id
     }
   }
-  /// The date formatted for use in app.
-  var formattedStringDate: String {
-    return date.formattedStringDate()
-  }
 
-  init() {
-    self.id = UUID()
-    self.date = Date()
-    self.lastUpdated = self.date
-    self.content = ""
-  }
-
-  init(id: UUID, date: Date, content: String) {
+  init(id: UUID, date: Date, contents: String) {
     self.id = id
-    self.date = date
-    self.lastUpdated = date
-    self.content = content
+    self.createdAt = date
+    self.contents = contents
   }
 
-  init(id: UUID, date: String, content: String) {
+  init(id: UUID, date: String, contents: String) {
     self.id = id
-    self.date = Date().formattedDateFrom(date) ?? Date()
-    self.lastUpdated = self.date
-    self.content = content
+    self.createdAt = Date().formattedDateFrom(date) ?? Date()
+    self.contents = contents
   }
 
-  init(date: Date, content: String) {
-    self.id = UUID()
-    self.date = date
-    self.lastUpdated = date
-    self.content = content
+  init(date: Date, contents: String) {
+    self.createdAt = date
+    self.contents = contents
   }
 
-  init(date: String, content: String) {
-    self.id = UUID()
-    self.date = Date().formattedDateFrom(date) ?? Date()
-    self.lastUpdated = self.date
-    self.content = content
+  init(date: String, contents: String) {
+    self.createdAt = Date().formattedDateFrom(date) ?? Date()
+    self.contents = contents
   }
 
-  init(entry: Entry, content: String) {
-    self.id = entry.id
-    self.date = entry.date
-    self.lastUpdated = Date()
-    self.content = content
+  init(entry: Entry, contents: String) {
+    self.createdAt = entry.createdAt
+    self.contents = contents
   }
 
-  mutating func setLastUpdated(_ date: Date) {
-    self.lastUpdated = date
-  }
-}
-
-extension Entry: Identifiable, Hashable {
-}
-extension Entry: Comparable {
   static func < (lhs: Entry, rhs: Entry) -> Bool {
-    return lhs.date < rhs.date  && lhs.lastUpdated < rhs.lastUpdated
+    compareModels(lhs: lhs, rhs: rhs)
   }
 }
