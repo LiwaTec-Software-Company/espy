@@ -10,12 +10,16 @@ import Foundation
 struct File: Model {
   typealias T = File
 
+  static let metaStart: String = ":$p"
+  static let metaEnd: String = "::y"
+
   var id: UUID = UUID()
   var createdAt: Date = Date()
   var updatedAt: Date = Date()
   var url: URL!
   var name: String = ""
   var contents: String = ""
+  var metaTags: [Tag: String] = [Tag: String]()
   var path: String {
     url.path
   }
@@ -23,6 +27,10 @@ struct File: Model {
   init() {
     self.name = createdAt.formattedStringDate()
     self.url = LocalManager.asMarkdown(name: self.name)
+    self.metaTags = [
+      .createdAt: createdAt.formattedStringDate(),
+      .updatedAt: updatedAt.formattedStringDate()
+    ]
   }
 
   /// Initializer used for files loaded from local directory.
@@ -42,6 +50,15 @@ struct File: Model {
   func extractEntryId() -> UUID? {
     guard let lastLine = contents.split(whereSeparator: \.isNewline).last else { return nil }
     return UUID(uuidString: String(lastLine))
+  }
+
+  func formattedStringTags() -> String {
+    var meta: String = "\(File.metaStart)\n"
+    for tag in metaTags {
+      meta += "*\(tag.key) \(tag.value)\n"
+    }
+    meta += "\(File.metaEnd)\n"
+    return meta
   }
 
   static func < (lhs: File, rhs: File) -> Bool {

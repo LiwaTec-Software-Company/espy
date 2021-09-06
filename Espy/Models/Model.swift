@@ -28,7 +28,7 @@ extension Model {
   }
 
   func getInSaveFormat() -> String {
-      return contents + "\n\n" + id.uuidString
+      return contents + "\n:%:" + id.uuidString + ":$"
   }
 
   func getLongStringDate() -> String {
