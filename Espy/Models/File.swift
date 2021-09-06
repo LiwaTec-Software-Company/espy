@@ -31,7 +31,7 @@ struct File: Model {
   }
 
   /// Initializer used for files loaded from local directory.
-  init(name: String, url: URL, createdAt: Date?, updatedAt: Date?, contents: String?) {
+  init(name: String, url: URL, createdAt: Date?, updatedAt: Date?, metaTags: [ModelTag: String]?, contents: String?) {
     self.name = name
     self.url = url
     if createdAt != nil { self.createdAt = createdAt! }

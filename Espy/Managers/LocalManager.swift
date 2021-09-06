@@ -69,20 +69,30 @@ class LocalManager: ObservableObject  {
   // READ
   func loadFile(_ url: URL, extension: String = "md") -> File {
     let name = url.deletingPathExtension().lastPathComponent
-    let contents = getContentsFrom(file: url)
     let attributes = getFileAttributes(url: url)
     let createdAt = attributes?[FileAttributeKey.creationDate] as? Date
     let updatedAt = attributes?[FileAttributeKey.modificationDate] as? Date
-    let metaTags = getTags(from: contents)
-    return File(name: name, url: url, createdAt: createdAt, updatedAt: updatedAt, contents: contents)
+    let contents = getContentsFrom(file: url)
+    let metaTags = getTags(from: contents ?? "")
+
+    return File(name: name, url: url, createdAt: createdAt, updatedAt: updatedAt, metaTags: metaTags, contents: contents)
   }
 
   func getTags(from contents: String) -> [ModelTag: String]? {
-    let lines = contents.split(whereSeparator: \.isNewline)
-    
-    for line in lines {
-      
+    /// Looks for a
+    let metaBlockRegex = "/(?<=\:\$P\n)([^]+)(?=\n\:\:Y)/gm"
+    if let regex = try? NSRegularExpression(pattern: metaBlockRegex)
+    {
+        return regex.matches(in: contents, options: [], range: NSRange(location: 0, length: string.length)).map {
+          contents.substring(with: $0.range).replacingOccurrences(of: "#", with: "").lowercased()
+        }
     }
+    return nil
+//    let lines = contents.split(whereSeparator: \.isNewline)
+//    let regex =
+//    for line in lines {
+//
+//    }
   }
 
   func getContentsFrom(file url: URL) -> String? {

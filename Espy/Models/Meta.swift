@@ -9,12 +9,13 @@ import Foundation
 import UniformTypeIdentifiers
 
 struct Meta {
-  static let blockStart: String = ":$P"
-  static let blockEnd: String = "::Y"
-  static let base: String = "*"
+  static let start: String = ":$P"
+  static let end: String = "::Y"
+  static let regex: String = #"/(?<=\:\$P\n)([^]+)(?=\n\:\:Y)/gm"#
 }
 
-struct Tags {
+struct MetaTag {
+  static let base: String = "  "
   static let id = "id"
   static let createdAt = "createdAt"
   static let updatedAt = "updatedAt"
@@ -31,13 +32,13 @@ enum ModelTag: Hashable {
   func asAstring() -> String {
     switch self {
     case .id:
-      return Tags.id
+      return MetaTag.id
     case .createdAt:
-      return Tags.createdAt
+      return MetaTag.createdAt
     case .updatedAt:
-      return Tags.updatedAt
+      return MetaTag.updatedAt
     case .group:
-      return Tags.group
+      return MetaTag.group
     case let .custom(name):
       return name
     }
