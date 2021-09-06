@@ -9,8 +9,8 @@ import Foundation
 import UniformTypeIdentifiers
 
 struct Meta {
-  static let blockStart: String = ":$P" // :$P
-  static let blockEnd: String = "::Y" // ::Y
+  static let blockStart: String = ":$P"
+  static let blockEnd: String = "::Y"
   static let base: String = "*"
 }
 
@@ -26,7 +26,7 @@ enum ModelTag: Hashable {
   case createdAt
   case updatedAt
   case group
-  case custom(name: String)
+  case custom(String)
 
   func asAstring() -> String {
     switch self {
@@ -38,7 +38,7 @@ enum ModelTag: Hashable {
       return Tags.updatedAt
     case .group:
       return Tags.group
-    case .custom(let name):
+    case let .custom(name):
       return name
     }
   }

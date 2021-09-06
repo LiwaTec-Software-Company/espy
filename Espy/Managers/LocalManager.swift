@@ -19,6 +19,7 @@ class LocalManager: ObservableObject  {
   
   init() {
     self.fileManager = FileManager.default
+    let _ = self.loadAllLocalFiles()
   }
 
   func loadAllLocalFiles() -> [File]? {
@@ -72,7 +73,16 @@ class LocalManager: ObservableObject  {
     let attributes = getFileAttributes(url: url)
     let createdAt = attributes?[FileAttributeKey.creationDate] as? Date
     let updatedAt = attributes?[FileAttributeKey.modificationDate] as? Date
+    let metaTags = getTags(from: contents)
     return File(name: name, url: url, createdAt: createdAt, updatedAt: updatedAt, contents: contents)
+  }
+
+  func getTags(from contents: String) -> [ModelTag: String]? {
+    let lines = contents.split(whereSeparator: \.isNewline)
+    
+    for line in lines {
+      
+    }
   }
 
   func getContentsFrom(file url: URL) -> String? {
