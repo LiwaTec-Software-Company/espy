@@ -10,16 +10,13 @@ import Foundation
 struct File: Model {
   typealias T = File
 
-  static let metaStart: String = ":$p"
-  static let metaEnd: String = "::y"
-
   var id: UUID = UUID()
   var createdAt: Date = Date()
   var updatedAt: Date = Date()
   var url: URL!
   var name: String = ""
   var contents: String = ""
-  var metaTags: [Tag: String] = [Tag: String]()
+  var metaTags: [ModelTag: String] = [ModelTag: String]()
   var path: String {
     url.path
   }
@@ -53,11 +50,11 @@ struct File: Model {
   }
 
   func formattedStringTags() -> String {
-    var meta: String = "\(File.metaStart)\n"
-    for tag in metaTags {
-      meta += "*\(tag.key) \(tag.value)\n"
+    var meta: String = "\(Meta.blockStart)\n"
+    for (tag, value) in metaTags {
+      meta += "\(Meta.base)\(tag) \(value)\n"
     }
-    meta += "\(File.metaEnd)\n"
+    meta += "\(Meta.blockEnd)\n"
     return meta
   }
 
@@ -67,5 +64,11 @@ struct File: Model {
 
   static func == (lhs: File, rhs: File) -> Bool {
     return equateModels(lhs: lhs, rhs: rhs)
+  }
+}
+
+extension File {
+  mutating func set(tag: ModelTag, to value: String) {
+    self.metaTags[tag] = value
   }
 }

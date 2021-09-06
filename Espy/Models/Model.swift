@@ -27,9 +27,6 @@ extension Model {
     self.updatedAt = date
   }
 
-  func getInSaveFormat() -> String {
-      return contents + "\n:%:" + id.uuidString + ":$"
-  }
 
   func getLongStringDate() -> String {
     return createdAt.formattedStringDate()
