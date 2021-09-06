@@ -12,7 +12,7 @@ struct DocumentsDirectory {
   static let iCloudDocumentsURL = FileManager.default.url(forUbiquityContainerIdentifier: nil)?.appendingPathComponent("Documents")
 }
 
-class LocalManager {
+class LocalManager: ObservableObject  {
   static let shared = LocalManager()
   var idMap = [UUID: File]()
   let fileManager: FileManager!
@@ -24,7 +24,7 @@ class LocalManager {
 
   func loadAllLocalFiles() {
     do {
-      let urls = try fileManager.contentsOfDirectory(at: getDocumentDiretoryURL(), includingPropertiesForKeys: nil)
+      let urls = try fileManager.contentsOfDirectory(at: LocalManager.getDocumentDiretoryURL(), includingPropertiesForKeys: nil)
       for url in urls {
         if !url.lastPathComponent.contains(".md") { continue }
         let file = loadFile(url)
@@ -36,14 +36,12 @@ class LocalManager {
   }
 
   // CREATE
-
-  func create(file: File = File(), write contents: String = "") -> File {
+  func create(file: File, write contents: String = "") -> File {
     do {
       try contents.write(to: file.url, atomically: true, encoding: .utf8)
     }
     catch {
       print("Unable to add this entry.")
-      return file
     }
 
     idMap[file.id] = file
@@ -53,6 +51,15 @@ class LocalManager {
   func createFile(name: String, write contents: String = "") -> File {
     let file = File(name: name, contents: contents)
     return create(file: file)
+  }
+
+  func getFile(with url: URL) -> File {
+    for file in idMap.values {
+      if file.url == url {
+        return file
+      }
+    }
+    return loadFile(url)
   }
 
   // READ
@@ -73,10 +80,6 @@ class LocalManager {
     }
   }
 
-  func getDocumentDiretoryURL() -> URL {
-    return DocumentsDirectory.localDocumentsURL
-  }
-
   func doesFileExist(_ url: URL) -> Bool {
     return fileManager.fileExists(atPath: url.path)
   }
@@ -94,6 +97,22 @@ class LocalManager {
       } catch let error as NSError {
         print("Failed deleting files : \(error)")
       }
+    }
+  }
+
+  func delete(file: File) {
+    do {
+      try fileManager.removeItem(at: file.url)
+    } catch let error as NSError {
+      print("Failed deleting files : \(error)")
+    }
+
+    remove(file: file)
+  }
+
+  private func remove(file: File) {
+    if let index = idMap.index(forKey: file.id) {
+      idMap.remove(at: index)
     }
   }
 
@@ -128,6 +147,16 @@ class LocalManager {
     } catch {
       return nil
     }
+  }
+}
+
+extension LocalManager {
+  static func getDocumentDiretoryURL() -> URL {
+    return DocumentsDirectory.localDocumentsURL
+  }
+
+  static func asMarkdown(name: String) -> URL {
+    return getDocumentDiretoryURL().appendingPathComponent("\(name).md")
   }
 }
 

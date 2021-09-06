@@ -33,16 +33,12 @@ struct EditView: View {
     self.selectedEntry = entry
 
     self.isNew = isNew
-    _fullText = State(initialValue: selectedEntry.content)
+    _fullText = State(initialValue: selectedEntry.contents)
     originalText = self.fullText
   }
 
-  init(file: URL) {
-    if let entry = LocalManager.shared.getLocalEntry(with: file) {
-      self.init(entry)
-    } else {
-      self.init()
-    }
+  init(url: URL) {
+    self.init(MainManager.shared.getEntry(with: url))
   }
 
   init(id: UUID, isNew: Bool = false) {
@@ -59,7 +55,7 @@ struct EditView: View {
         EditModeButton()
         Spacer()
         VStack(alignment: .center, spacing: 1) {
-          Text(selectedEntry.date.displayDate()).padding(5).font(.title3).foregroundColor(isNew ? .green : .primary)
+          Text(selectedEntry.createdAt.displayDate()).padding(5).font(.title3).foregroundColor(isNew ? .green : .primary)
           Text(selectedEntry.id.uuidString).padding(0).font(.caption).foregroundColor(isNew ? .green : .gray)
           Text(currentDate.formattedStringDate()).padding(5).font(.caption).foregroundColor((isTextUpdated || isNew) ? .green : .gray)
         }
@@ -67,7 +63,7 @@ struct EditView: View {
         TrashButton(onPress: {
           if (!isNew) {
             ContentManager.shared.unselect(selectedEntry)
-            LocalManager.shared.deleteEntryAndFile(selectedEntry)
+            MainManager.shared.delete(entry: selectedEntry)
             presentationMode.wrappedValue.dismiss()
           }
         })
@@ -79,12 +75,12 @@ struct EditView: View {
       })
 
       Button(action: {
-        let entry = Entry(entry: selectedEntry, content: fullText)
+        let entry = Entry(entry: selectedEntry, contents: fullText)
 
         if isNew {
-          LocalManager.shared.createFileFor(entry)
+          MainManager.shared.add(entry: entry)
         } else if isTextUpdated {
-          LocalManager.shared.updateEntryAndFile(with: selectedID)
+          MainManager.shared.update(entry: entry)
         }
 
         ContentManager.shared.unselect(selectedEntry)

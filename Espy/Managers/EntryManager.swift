@@ -27,6 +27,7 @@ class EntryManager: ObservableObject  {
     return idMap[id]
   }
 
+  /// Removes given entry from the idMap
   func remove(_ entry: Entry) {
     guard let index = idMap.index(forKey: entry.id) else { return }
     idMap.remove(at: index)

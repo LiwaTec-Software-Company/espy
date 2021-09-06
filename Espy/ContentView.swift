@@ -8,61 +8,6 @@
 import SwiftUI
 import MarkdownUI
 
-class ContentManager: ObservableObject {
-  static let shared = ContentManager()
-  @Published var isMultiSelectOn: Bool = false
-  @Published var isEditModeOn: Bool = false
-  @Published var entriesSelected: [Entry] = []
-
-  var isAnythingSelected: Bool {
-    get {
-      entriesSelected.count > 0
-    }
-  }
-
-  var isMultipleSelected: Bool {
-    get {
-      entriesSelected.count > 1
-    }
-  }
-
-  var isEverythingSelected: Bool {
-    get {
-      entriesSelected.count == EntryManager.shared.entryMap.pcount
-    }
-  }
-
-  func isEntrySelected(_ entry: Entry) -> Bool {
-    return entriesSelected.contains(entry)
-  }
-
-  func toggleSelect(_ entry: Entry) {
-    if entriesSelected.contains(entry) {
-      entriesSelected.removeAll(where: { $0 == entry })
-    }
-    else {
-      entriesSelected.append(entry)
-    }
-  }
-
-  func unselectAll() {
-    entriesSelected.removeAll()
-  }
-
-  func unselect(_ entry: Entry) {
-    entriesSelected.removeAll(where: { $0 == entry })
-  }
-
-  func select(_ entry: Entry) {
-    if !entriesSelected.contains(entry) {
-      entriesSelected.append(entry)
-    }
-  }
-
-  func update() {
-    
-  }
-}
 
 struct EntryRow: View {
   @EnvironmentObject var contentManager: ContentManager
@@ -107,18 +52,18 @@ struct EntryRow: View {
       HStack {
         VStack(alignment: .leading, spacing: 2) {
           HStack(alignment: .firstTextBaseline) {
-            Text(entry.date.shortString())
+            Text(entry.createdAt.shortString())
               .font(.caption).foregroundColor(.accentColor)
             Spacer()
-            Text(entry.lastUpdated.shortString())
+            Text(entry.updatedAt.shortString())
               .font(.caption).foregroundColor(.gray)
           }
-          let markdownLines: [MarkdownLine] = entry.content.components(separatedBy: .newlines).map { line in
+          let markdownLines: [MarkdownLine] = entry.contents.components(separatedBy: .newlines).map { line in
             return MarkdownLine(line: line)
           }
 
           if contentManager.isEditModeOn {
-            Text(entry.content)
+            Text(entry.contents)
           } else {
             Group {
               ForEach(markdownLines, id: \.self) { (markdownLine: MarkdownLine) in
@@ -200,8 +145,10 @@ struct BlockModeButton: View {
 }
 
 struct ContentView: View {
-  @ObservedObject var contentManager: ContentManager = ContentManager.shared
-  @ObservedObject private var entryManager = EntryManager.shared
+  @ObservedObject private var mainManager: MainManager = MainManager.shared
+  @ObservedObject private var contentManager = MainManager.shared.contentManager
+  @ObservedObject private var entryManager = MainManager.shared.entryManager
+
 
   @State private var isShowingEntrySheet = false
   @State private var isShowingBottomSheet = true
@@ -210,11 +157,17 @@ struct ContentView: View {
 
   @State private var currentEntry: Entry?
 
+  private var entriesSelected: [Entry] {
+    get {
+      Array(contentManager.selectionMap.values)
+    }
+  }
+
   private var canShowSheetForEntry: Binding<Bool> {
     Binding (
       get: {
         if let currentEntry = currentEntry {
-         return isShowingDocSheet && contentManager.isEntrySelected(currentEntry)
+          return isShowingDocSheet && contentManager.isEntrySelected(currentEntry)
         }
         return false
       },
@@ -223,12 +176,6 @@ struct ContentView: View {
   }
 
   @State var editViewFromDocSheet: EditView?
-
-  var isMultiSelectOn: Bool {
-    get {
-      contentManager.isMultiSelectOn
-    }
-  }
 
   init() {
     let barBackgroundImage = UIImage(color: UIColor(hue: 0, saturation: 1, brightness: 0, alpha: 0.7))
@@ -242,7 +189,7 @@ struct ContentView: View {
     NavigationView {
       ScrollView {
         VStack {
-          ForEach(entryManager.entryMap.sorted(by: {$0.key > $1.key}), id: \.value) { entry, id in
+          ForEach(entryManager.idMap.sorted(by: {$0.value > $1.value}), id: \.key) { id, entry in
             EntryRow(entry: entry, action: {
               selectRow(with: entry)
               if !contentManager.isMultiSelectOn {
@@ -263,7 +210,7 @@ struct ContentView: View {
         }
       }
       .onAppear {
-        LocalManager.shared.loadAllEntryFiles()
+        MainManager.shared.loadAll()
         isShowingBottomSheet = true
       }
       .toolbar {
@@ -300,10 +247,10 @@ struct ContentView: View {
             Image(systemName: "folder")
           }.sheet(isPresented: $isShowingDocSheet, content: {
             DocumentPicker { url in
-              self.editViewFromDocSheet = EditView(file: url)
+              self.editViewFromDocSheet = EditView(url: url)
               isShowingDocEntrySheet.toggle()
             }.onDisappear {
-              LocalManager.shared.loadAllEntryFiles()
+              MainManager.shared.loadAll()
             }
           }).sheet(isPresented: $isShowingDocEntrySheet) {
             if let editView = editViewFromDocSheet {
@@ -343,13 +290,12 @@ struct ContentView: View {
 
   func onDelete(at offsets: IndexSet) {
     // preserve all ids to be deleted to avoid indices confusing
-    let entriesToDelete = offsets.map { entryManager.entries[$0] }
-    LocalManager.shared.deleteEntriesAndFiles(entriesToDelete)
+    let idsToDelete = offsets.map { Array(entryManager.idMap.keys)[$0] }
+    MainManager.shared.delete(ids: idsToDelete)
   }
 
   func deleteAllSelectedEntries() {
-    LocalManager.shared.deleteEntriesAndFiles(contentManager.entriesSelected)
-    contentManager.entriesSelected.removeAll()
+    MainManager.shared.delete(entries: entriesSelected)
   }
 
   func selectRow(with entry: Entry) {
@@ -358,15 +304,15 @@ struct ContentView: View {
   
 
   func selectAllRows() {
-    if contentManager.entriesSelected.count == entryManager.entryMap.count {
-      contentManager.entriesSelected.removeAll()
+    if contentManager.selectionMap.count == entryManager.idMap.count {
+      contentManager.selectionMap.removeAll()
     } else {
-      contentManager.entriesSelected = EntryManager.shared.entries
+      contentManager.selectionMap = entryManager.idMap
     }
   }
 
   func unselectAllRows() {
-    contentManager.entriesSelected.removeAll()
+    contentManager.selectionMap.removeAll()
   }
 }
 

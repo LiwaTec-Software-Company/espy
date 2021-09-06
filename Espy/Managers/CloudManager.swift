@@ -8,7 +8,7 @@
 
 import Foundation
 
-class CloudManager {
+class CloudManager: ObservableObject  {
   static let shared = CloudManager()
   // Return the Document directory (Cloud OR Local)
   func isCloudEnabled() -> Bool {

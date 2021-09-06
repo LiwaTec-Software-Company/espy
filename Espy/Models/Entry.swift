@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import SwiftUI
 
 struct Entry: Model {
   typealias T = Entry
@@ -14,16 +15,18 @@ struct Entry: Model {
   var id: UUID = UUID()
   var createdAt: Date = Date()
   var updatedAt: Date = Date()
-  var file: File = File()
   var contents: String = ""
+  var file: File = File()
 
+  init() {}
+  
   init(file: File) {
     self.createdAt = file.createdAt
     self.updatedAt = file.updatedAt
     self.file = file
     self.contents = file.contents
     if let idFromFile = file.extractEntryId() {
-      self.id = id
+      self.id = idFromFile
     }
   }
 
@@ -54,7 +57,15 @@ struct Entry: Model {
     self.contents = contents
   }
 
+  mutating func set(file: File) {
+    self.file = file
+  }
+
   static func < (lhs: Entry, rhs: Entry) -> Bool {
     compareModels(lhs: lhs, rhs: rhs)
+  }
+
+  static func == (lhs: Entry, rhs: Entry) -> Bool {
+    return lhs.id == rhs.id && lhs.createdAt == rhs.createdAt && lhs.updatedAt == rhs.updatedAt && lhs.contents == rhs.contents && lhs.file == rhs.file
   }
 }

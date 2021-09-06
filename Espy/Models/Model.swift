@@ -19,7 +19,10 @@ extension Model {
   static func compareModels<T: Model>(lhs: T, rhs: T) -> Bool {
     return lhs.createdAt < rhs.createdAt  && lhs.updatedAt < rhs.updatedAt
   }
-
+  static func equateModels<T:Model>(lhs: T, rhs: T) -> Bool{
+    return lhs.id == rhs.id && lhs.createdAt == rhs.createdAt && lhs.updatedAt == rhs.updatedAt && lhs.contents == rhs.contents
+  }
+  
   mutating func setUpdatedAt(_ date: Date) {
     self.updatedAt = date
   }

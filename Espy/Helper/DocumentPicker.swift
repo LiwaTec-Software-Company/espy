@@ -23,7 +23,7 @@ struct DocumentPicker: UIViewControllerRepresentable {
 
   func makeUIViewController(context: Context) -> UIDocumentPickerViewController {
     let controller = UIDocumentPickerViewController(documentTypes: [String(kUTTypeText)], in: .open)
-    controller.directoryURL = LocalManager.shared.getDocumentDiretoryURL()
+    controller.directoryURL = LocalManager.getDocumentDiretoryURL()
     controller.delegate = context.coordinator
     controller.allowsMultipleSelection = true
 
