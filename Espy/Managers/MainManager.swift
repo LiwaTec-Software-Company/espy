@@ -33,6 +33,7 @@ extension MainManager {
   // CREATE
   func add(entry: Entry) {
     entryManager.add(entry)
+    let _ = createFile(for: entry)
   }
 
   func createFile(for entry: Entry) -> File {
@@ -41,7 +42,8 @@ extension MainManager {
 
   // READ
   func loadAll() {
-    localManager.loadAllLocalFiles()
+    guard let files = localManager.loadAllLocalFiles() else { return }
+    let _ = loadEntries(from: files)
   }
 
   func loadEntry(from file: File) -> Entry {

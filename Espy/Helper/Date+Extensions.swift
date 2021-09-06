@@ -29,7 +29,7 @@ extension Date {
 
   func shortString() -> String {
     let dateFormatter = DateFormatter()
-    dateFormatter.dateFormat = "d > h:mm:ss a"
+    dateFormatter.dateFormat = "yyyy-MMdd-HHmm-ss's'SSS"
     return dateFormatter.string(from: self)
   }
 }

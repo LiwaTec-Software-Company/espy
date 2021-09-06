@@ -19,20 +19,23 @@ class LocalManager: ObservableObject  {
   
   init() {
     self.fileManager = FileManager.default
-    self.loadAllLocalFiles()
   }
 
-  func loadAllLocalFiles() {
+  func loadAllLocalFiles() -> [File]? {
+    var files = [File]()
     do {
       let urls = try fileManager.contentsOfDirectory(at: LocalManager.getDocumentDiretoryURL(), includingPropertiesForKeys: nil)
       for url in urls {
         if !url.lastPathComponent.contains(".md") { continue }
         let file = loadFile(url)
         idMap[file.id] = file
+        files.append(file)
       }
     } catch {
       print("Unable to get entires from directory.")
+      return nil
     }
+    return files
   }
 
   // CREATE

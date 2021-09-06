@@ -162,19 +162,6 @@ struct ContentView: View {
       Array(contentManager.selectionMap.values)
     }
   }
-
-  private var canShowSheetForEntry: Binding<Bool> {
-    Binding (
-      get: {
-        if let currentEntry = currentEntry {
-          return isShowingDocSheet && contentManager.isEntrySelected(currentEntry)
-        }
-        return false
-      },
-      set: { $0 }
-    )
-  }
-
   @State var editViewFromDocSheet: EditView?
 
   init() {
@@ -210,7 +197,7 @@ struct ContentView: View {
         }
       }
       .onAppear {
-        MainManager.shared.loadAll()
+        mainManager.loadAll()
         isShowingBottomSheet = true
       }
       .toolbar {
@@ -285,6 +272,8 @@ struct ContentView: View {
         }
       }
     }
+    .environmentObject(mainManager)
+    .environmentObject(entryManager)
     .environmentObject(contentManager)
   }
 
