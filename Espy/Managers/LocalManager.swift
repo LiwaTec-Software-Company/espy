@@ -80,9 +80,7 @@ class LocalManager: ObservableObject  {
 
   func getMetaTags(from contents: String) -> [TagName: Tag] {
     var tagMap = [TagName: Tag]()
-    guard let metaBlockRange =
-            NSRegularExpression(Meta.regex)
-            .getMatchRange(in: contents) else {
+    guard let metaBlockRange = Meta.regex.getMatchRange(in: contents) else {
       return tagMap
     }
     let metaTags = contents[metaBlockRange].split(whereSeparator: \.isNewline)

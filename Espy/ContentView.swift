@@ -58,12 +58,13 @@ struct EntryRow: View {
             Text(entry.updatedAt.shortString())
               .font(.caption).foregroundColor(.gray)
           }
-          let markdownLines: [MarkdownLine] = entry.contents.components(separatedBy: .newlines).map { line in
+          let markdownLines: [MarkdownLine] = entry.formatted.components(separatedBy: .newlines).map { line in
             return MarkdownLine(line: line)
           }
 
           if contentManager.isEditModeOn {
-            Text(entry.contents)
+            Text(entry.formatted)
+            Text("\n\(entry.file.formattedStringTags())")
           } else {
             Group {
               ForEach(markdownLines, id: \.self) { (markdownLine: MarkdownLine) in
@@ -71,7 +72,6 @@ struct EntryRow: View {
               }
             }
           }
-          Text("Oh hello! My file meta tags are:\n\n\(entry.file.formattedStringTags())\nThank you for your patience.")
         }
       }
       .frame(maxWidth: .infinity, maxHeight: .infinity).padding().background(Color.black)

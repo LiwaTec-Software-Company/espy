@@ -26,6 +26,11 @@ extension NSRegularExpression {
     return firstMatch(in: string, options: [], range: range)
   }
 
+  func replacingMatch(in string: String, with template: String = "") -> String {
+    let range = NSRange(location: 0, length: string.utf16.count)
+    return stringByReplacingMatches(in: string, options: [], range: range, withTemplate: template)
+  }
+
   func getMatchRange(in string: String) -> Range<String.Index>? {
     guard let nsRange = getMatch(string)?.range else { return nil }
     return Range(nsRange, in: string)

@@ -17,7 +17,8 @@ protocol Tagable: Hashable {
 struct Meta {
   static let start: String = ":SP"
   static let end: String = "::Y"
-  static let regex: String = ":SP\\n[^$]+\\n::Y"
+  static let regexString: String = ":SP\\n[^$]+\\n::Y"
+  static let regex: NSRegularExpression = NSRegularExpression(Meta.regexString)
   static let indent: String = "  "
 }
 

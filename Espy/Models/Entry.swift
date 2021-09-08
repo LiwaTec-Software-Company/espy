@@ -17,7 +17,11 @@ struct Entry: Model {
   var updatedAt: Date = Date()
   var contents: String = ""
   var file: File = File()
-
+  var formatted: String {
+    get {
+      getContentsWithoutMeta()
+    }
+  }
 
   init() {}
   
@@ -68,5 +72,9 @@ struct Entry: Model {
 
   static func == (lhs: Entry, rhs: Entry) -> Bool {
     return lhs.id == rhs.id && lhs.createdAt == rhs.createdAt && lhs.updatedAt == rhs.updatedAt && lhs.contents == rhs.contents && lhs.file == rhs.file
+  }
+
+  func getContentsWithoutMeta() -> String {
+    return Meta.regex.replacingMatch(in: contents, with: "")
   }
 }
