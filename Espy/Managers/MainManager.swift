@@ -39,7 +39,7 @@ extension MainManager {
   func createFile(for entry: Entry) -> File {
     var file = entry.file
     file.set(name: .id, to: entry.id.uuidString)
-    file.set(name: .custom("custom"), to: "this is a custom tag")
+    file.set(name: .defined("custom"), to: "this is a custom tag")
     let formattedContents = entry.contents + "\n" + file.formattedStringTags()
     return localManager.create(file: entry.file, write: formattedContents)
   }

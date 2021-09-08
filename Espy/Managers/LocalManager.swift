@@ -88,6 +88,9 @@ class LocalManager: ObservableObject  {
     let metaTags = contents[metaBlockRange].split(whereSeparator: \.isNewline)
     for tag in metaTags {
       let sections = tag.split(whereSeparator: \.isWhitespace)
+      if sections[0] == Meta.start || sections[0] == Meta.end {
+        continue
+      }
       let name = TagName(String(sections[0]))
       tagMap[name] = Tag(name, String(sections[1...].joined(separator: " ")))
     }

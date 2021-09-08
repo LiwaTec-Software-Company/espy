@@ -40,7 +40,7 @@ enum TagName: Hashable {
   case createdAt
   case updatedAt
   case group
-  case custom(String)
+  case defined(String)
 
   init(_ name: String) {
     switch name {
@@ -53,7 +53,7 @@ enum TagName: Hashable {
     case "group":
       self = .group
     default:
-      self = .custom(name)
+      self = .defined(name)
     }
   }
 
@@ -67,8 +67,17 @@ enum TagName: Hashable {
       return "updatedAt"
     case .group:
       return "group"
-    case let .custom(name):
-      return name
+    case let .defined(name):
+      return clean(name)
     }
+  }
+
+  func clean(_ dirtyName: String) -> String {
+    return dirtyName
+      .replacingOccurrences(of: "defined", with: "")
+      .replacingOccurrences(of: "(", with: "")
+      .replacingOccurrences(of: ")", with: "")
+      .replacingOccurrences(of: "\"", with: "")
+      .replacingOccurrences(of: "\\", with: "")
   }
 }
