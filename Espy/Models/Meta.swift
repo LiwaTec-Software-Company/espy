@@ -28,6 +28,11 @@ struct Tag: Tagable {
     self.name = name
     self.value = value
   }
+
+  init(_ name: String, _ value: String) {
+    self.name = TagName(name)
+    self.value = value
+  }
 }
 
 enum TagName: Hashable {
@@ -36,6 +41,21 @@ enum TagName: Hashable {
   case updatedAt
   case group
   case custom(String)
+
+  init(_ name: String) {
+    switch name {
+    case "id":
+      self = .id
+    case "createdAt":
+      self = .createdAt
+    case "updatedAt":
+      self = .updatedAt
+    case "group":
+      self = .group
+    default:
+      self = .custom(name)
+    }
+  }
 
   func asAstring() -> String {
     switch self {

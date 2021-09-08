@@ -24,24 +24,32 @@ struct File: Model {
   init() {
     self.name = createdAt.formattedStringDate()
     self.url = LocalManager.asMarkdown(name: self.name)
-    let createdAtTag = Tag(.createdAt, createdAt.formattedStringDate())
-    let updatedAtTag = Tag(.updatedAt, updatedAt.formattedStringDate())
-    self.tagMap[.createdAt] = createdAtTag
-    self.tagMap[.updatedAt] = updatedAtTag
+    setDefaultTags()
   }
 
   /// Initializer used for files loaded from local directory.
-  init(name: String, url: URL, createdAt: Date?, updatedAt: Date?, metaTags: [TagName: String]?, contents: String?) {
+  init(name: String, url: URL, createdAt: Date?, updatedAt: Date?, tagMap: [TagName: Tag]?, contents: String?) {
+    self.init()
     self.name = name
     self.url = url
     self.createdAt = createdAt ?? Date()
     self.updatedAt = updatedAt ?? self.createdAt
     self.contents = contents ?? "# \(self.createdAt)"
+    if tagMap != nil {
+      self.tagMap = tagMap!
+    }
   }
 
   init(name: String, contents: String = "") {
     let url = LocalManager.asMarkdown(name: name)
-    self.init(name: name, url: url, createdAt: nil, updatedAt: nil, metaTags: nil, contents: nil)
+    self.init(name: name, url: url, createdAt: nil, updatedAt: nil, tagMap: nil, contents: nil)
+  }
+
+  mutating func setDefaultTags() {
+    let createdAtTag = Tag(.createdAt, createdAt.formattedStringDate())
+    let updatedAtTag = Tag(.updatedAt, updatedAt.formattedStringDate())
+    self.tagMap[.createdAt] = createdAtTag
+    self.tagMap[.updatedAt] = updatedAtTag
   }
 
   func extractEntryId() -> UUID? {
@@ -51,8 +59,8 @@ struct File: Model {
 
   func formattedStringTags() -> String {
     var meta: String = "\(Meta.start)\n"
-    for tag in tagMap {
-      meta += "\(Meta.indent)\(tag.name) \(tag.value)\n"
+    for (name, tag) in tagMap {
+      meta += "\(Meta.indent)\(name) \(tag.value)\n"
     }
     meta += "\(Meta.end)\n"
     return meta
@@ -68,7 +76,7 @@ struct File: Model {
 }
 
 extension File {
-  mutating func set(tag: Tag, to value: String) {
-    self.tagMap[tag] = value
+  mutating func set(name: TagName, to value: String) {
+    self.tagMap[name] = Tag(name, value)
   }
 }

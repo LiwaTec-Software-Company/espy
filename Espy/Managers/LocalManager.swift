@@ -73,25 +73,26 @@ class LocalManager: ObservableObject  {
     let createdAt = attributes?[FileAttributeKey.creationDate] as? Date
     let updatedAt = attributes?[FileAttributeKey.modificationDate] as? Date
     let contents = getContentsFrom(file: url)
-    let metaTags = getTags(from: contents ?? "")
+    let metaTagMap = getMetaTags(from: contents ?? "")
 
-    return File(name: name, url: url, createdAt: createdAt, updatedAt: updatedAt, metaTags: metaTags, contents: contents)
+    return File(name: name, url: url, createdAt: createdAt, updatedAt: updatedAt, tagMap: metaTagMap, contents: contents)
   }
 
-  func getTags(from contents: String) -> [Tag] {
-    var tags = [Tag]()
+  func getMetaTags(from contents: String) -> [TagName: Tag] {
+    var tagMap = [TagName: Tag]()
     guard let metaBlockRange =
             NSRegularExpression(Meta.regex)
             .getMatchRange(in: contents) else {
-      return tags
+      return tagMap
     }
     let metaTags = contents[metaBlockRange].split(whereSeparator: \.isNewline)
     for tag in metaTags {
       let sections = tag.split(whereSeparator: \.isWhitespace)
-      tags.append(Tag(name: String(sections[0]), value: String(sections[1...].joined(separator: " "))))
+      let name = TagName(String(sections[0]))
+      tagMap[name] = Tag(name, String(sections[1...].joined(separator: " ")))
     }
-    print(tags)
-    return tags
+    print(tagMap)
+    return tagMap
   }
 
   func getContentsFrom(file url: URL) -> String? {

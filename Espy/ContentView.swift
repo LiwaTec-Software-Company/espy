@@ -71,6 +71,7 @@ struct EntryRow: View {
               }
             }
           }
+          Text("Oh hello! My file meta tags are:\n\(entry.file.tagMap.debugDescription)\nThank you for your patience.")
         }
       }
       .frame(maxWidth: .infinity, maxHeight: .infinity).padding().background(Color.black)

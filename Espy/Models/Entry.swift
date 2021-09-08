@@ -18,6 +18,7 @@ struct Entry: Model {
   var contents: String = ""
   var file: File = File()
 
+
   init() {}
   
   init(file: File) {
