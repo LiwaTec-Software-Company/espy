@@ -78,21 +78,20 @@ class LocalManager: ObservableObject  {
     return File(name: name, url: url, createdAt: createdAt, updatedAt: updatedAt, metaTags: metaTags, contents: contents)
   }
 
-  func getTags(from contents: String) -> [ModelTag: String]? {
-    /// Looks for a
-    let metaBlockRegex = "/(?<=\:\$P\n)([^]+)(?=\n\:\:Y)/gm"
-    if let regex = try? NSRegularExpression(pattern: metaBlockRegex)
-    {
-        return regex.matches(in: contents, options: [], range: NSRange(location: 0, length: string.length)).map {
-          contents.substring(with: $0.range).replacingOccurrences(of: "#", with: "").lowercased()
-        }
+  func getTags(from contents: String) -> [Tag] {
+    var tags = [Tag]()
+    guard let metaBlockRange =
+            NSRegularExpression(Meta.regex)
+            .getMatchRange(in: contents) else {
+      return tags
     }
-    return nil
-//    let lines = contents.split(whereSeparator: \.isNewline)
-//    let regex =
-//    for line in lines {
-//
-//    }
+    let metaTags = contents[metaBlockRange].split(whereSeparator: \.isNewline)
+    for tag in metaTags {
+      let sections = tag.split(whereSeparator: \.isWhitespace)
+      tags.append(Tag(name: String(sections[0]), value: String(sections[1...].joined(separator: " "))))
+    }
+    print(tags)
+    return tags
   }
 
   func getContentsFrom(file url: URL) -> String? {
