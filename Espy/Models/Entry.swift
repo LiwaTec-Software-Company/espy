@@ -23,7 +23,9 @@ struct Entry: Model {
     }
   }
 
-  init() {}
+  init() {
+    self.contents = file.contents
+  }
   
   init(file: File) {
     self.createdAt = file.createdAt
@@ -58,7 +60,9 @@ struct Entry: Model {
   }
 
   init(entry: Entry, contents: String) {
+    self.id = entry.id
     self.createdAt = entry.createdAt
+    self.updatedAt = Date()
     self.contents = contents
   }
 

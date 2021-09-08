@@ -58,20 +58,20 @@ struct EntryRow: View {
             Text(entry.updatedAt.shortString())
               .font(.caption).foregroundColor(.gray)
           }
-          let markdownLines: [MarkdownLine] = entry.formatted.components(separatedBy: .newlines).map { line in
-            return MarkdownLine(line: line)
-          }
 
-          if contentManager.isEditModeOn {
-            Text(entry.formatted)
-            Text("\n\(entry.file.formattedStringTags())")
-          } else {
-            Group {
+          VStack(alignment: .leading) {
+            if contentManager.isEditModeOn {
+              Text(entry.contents).font(.callout)
+            } else {
+              let markdownLines: [MarkdownLine] = entry.formatted.components(separatedBy: .newlines).map { line in
+                return MarkdownLine(line: line)
+              }
               ForEach(markdownLines, id: \.self) { (markdownLine: MarkdownLine) in
                 markdownLine
               }
             }
           }
+
         }
       }
       .frame(maxWidth: .infinity, maxHeight: .infinity).padding().background(Color.black)

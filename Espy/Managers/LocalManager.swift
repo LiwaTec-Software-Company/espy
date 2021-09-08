@@ -112,6 +112,16 @@ class LocalManager: ObservableObject  {
     return fileManager.fileExists(atPath: filePath)
   }
 
+  func update(_ file: File, canCreateNew: Bool = true) {
+    if doesFileExist(file.url) {
+      delete(file: file)
+      let _ = create(file: file)
+    }
+    if canCreateNew {
+      let _ = create(file: file)
+    }
+  }
+
   func deleteFilesInDirectory(url: URL?) {
     let enumerator = fileManager.enumerator(atPath: url!.path)
     while let file = enumerator?.nextObject() as? String {

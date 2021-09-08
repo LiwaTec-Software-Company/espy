@@ -9,6 +9,10 @@ import SwiftUI
 
 struct EditView: View {
   @Environment(\.presentationMode) var presentationMode
+  @EnvironmentObject var mainManager: MainManager
+  @EnvironmentObject var contentManager: ContentManager
+  @EnvironmentObject var entryManger: EntryManager
+
 
   @State var fullText: String = "# "
   @State var isTextUpdated: Bool = false
@@ -42,7 +46,7 @@ struct EditView: View {
   }
 
   init(id: UUID, isNew: Bool = false) {
-    if let entry = EntryManager.shared.getEntry(with: id) {
+    if let entry = MainManager.shared.getEntry(with: id) {
       self.init(entry, isNew: isNew)
     } else {
       self.init()
@@ -62,8 +66,8 @@ struct EditView: View {
         Spacer()
         TrashButton(onPress: {
           if (!isNew) {
-            ContentManager.shared.unselect(selectedEntry)
-            MainManager.shared.delete(entry: selectedEntry)
+            contentManager.unselect(selectedEntry)
+            mainManager.delete(entry: selectedEntry)
             presentationMode.wrappedValue.dismiss()
           }
         })
@@ -78,12 +82,12 @@ struct EditView: View {
         let entry = Entry(entry: selectedEntry, contents: fullText)
 
         if isNew {
-          MainManager.shared.add(entry: entry)
+          mainManager.add(entry: entry)
         } else if isTextUpdated {
-          MainManager.shared.update(entry: entry)
+          mainManager.update(entry: entry)
         }
 
-        ContentManager.shared.unselect(selectedEntry)
+        contentManager.unselect(selectedEntry)
         presentationMode.wrappedValue.dismiss()
       }, label: {
         Image(systemName: "chevron.compact.down")
@@ -93,7 +97,7 @@ struct EditView: View {
     })
     .onAppear(perform: {
       if (!isNew) {
-        ContentManager.shared.select(selectedEntry)
+        contentManager.select(selectedEntry)
       }
     })
   }

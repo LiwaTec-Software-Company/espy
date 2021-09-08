@@ -32,16 +32,17 @@ class MainManager: ObservableObject {
 extension MainManager {
   // CREATE
   func add(entry: Entry) {
-    entryManager.add(entry)
-    let _ = createFile(for: entry)
+    let file = createFile(for: entry)
+    entryManager.add(Entry(file: file))
   }
 
   func createFile(for entry: Entry) -> File {
     var file = entry.file
     file.set(name: .id, to: entry.id.uuidString)
-    file.set(name: .defined("custom"), to: "this is a custom tag")
+
     let formattedContents = entry.contents + "\n" + file.formattedStringTags()
-    return localManager.create(file: entry.file, write: formattedContents)
+    let newFile = localManager.create(file: entry.file, write: formattedContents)
+    return newFile
   }
 
   // READ
@@ -106,7 +107,8 @@ extension MainManager {
 
   // UPDATE
   func update(entry: Entry) {
-
+    entryManager.update(entry)
+    localManager.update(entry.file)
   }
 
   func delete(entry: Entry) {
