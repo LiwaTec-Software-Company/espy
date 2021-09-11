@@ -33,18 +33,13 @@ struct EntryRow: View {
     let longTapGesture = LongPressGesture(minimumDuration: 0.5).onEnded { _ in
       secondaryAction()
     }
-
     let doubleTapGesture = TapGesture(count: 2).onEnded { _ in
       thirdAction()
     }
-
-
     let tapGesture = TapGesture().onEnded { _ in
       action()
     }
-
     let longAndTap = tapGesture.exclusively(before: longTapGesture)
-
     let tapBeforeDoubleGesture = longAndTap.sequenced(before: doubleTapGesture)
 
     Button(action: {}) {
@@ -66,11 +61,10 @@ struct EntryRow: View {
                 return MarkdownLine(line: line)
               }
               ForEach(markdownLines, id: \.self) { (markdownLine: MarkdownLine) in
-                markdownLine
+                markdownLine.multilineTextAlignment(.leading)
               }
             }
           }
-
         }
       }
       .frame(maxWidth: .infinity, maxHeight: .infinity).padding().background(Color.black)

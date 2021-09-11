@@ -133,7 +133,7 @@ struct ContentView: View {
           }
           Spacer()
           Button(action: {
-            print("Edit button was tapped")
+            ExportView()
           }) {
             Image(systemName: contentManager.isMultipleSelected ? "arrowshape.turn.up.right.fill" : "arrowshape.turn.up.right.fill")
           }
