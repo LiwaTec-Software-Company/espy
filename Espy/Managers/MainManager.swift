@@ -42,6 +42,7 @@ extension MainManager {
 
     let formattedContents = entry.contents + "\n" + file.formattedStringTags()
     let newFile = localManager.create(file: entry.file, write: formattedContents)
+    entryManager.add(entry)
     return newFile
   }
 

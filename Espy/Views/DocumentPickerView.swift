@@ -1,5 +1,5 @@
 //
-//  DocumentPickerViewController.swift
+//  DocumentPickerView.swift
 //  Espy
 //
 //  Created by Willie Johnson on 8/31/21.
@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 import MobileCoreServices
 
-struct DocumentPicker: UIViewControllerRepresentable {
+struct DocumentPickerView: UIViewControllerRepresentable {
   var callback: (URL) -> ()
 
   func makeCoordinator() -> Coordinator {
@@ -18,7 +18,7 @@ struct DocumentPicker: UIViewControllerRepresentable {
 
   func updateUIViewController(
     _ uiViewController: UIDocumentPickerViewController,
-    context: UIViewControllerRepresentableContext<DocumentPicker>) {
+    context: UIViewControllerRepresentableContext<DocumentPickerView>) {
   }
 
   func makeUIViewController(context: Context) -> UIDocumentPickerViewController {
@@ -31,9 +31,9 @@ struct DocumentPicker: UIViewControllerRepresentable {
   }
 
   class Coordinator: NSObject, UIDocumentPickerDelegate {
-    var documentController: DocumentPicker
+    var documentController: DocumentPickerView
 
-    init(documentController: DocumentPicker) {
+    init(documentController: DocumentPickerView) {
       self.documentController = documentController
     }
 

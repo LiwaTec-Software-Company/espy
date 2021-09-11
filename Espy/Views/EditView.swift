@@ -13,7 +13,6 @@ struct EditView: View {
   @EnvironmentObject var contentManager: ContentManager
   @EnvironmentObject var entryManger: EntryManager
 
-
   @State var fullText: String = "# "
   @State var isTextUpdated: Bool = false
   @State private var currentDate: Date = Date()
@@ -86,7 +85,6 @@ struct EditView: View {
         } else if isTextUpdated {
           mainManager.update(entry: entry)
         }
-
         contentManager.unselect(selectedEntry)
         presentationMode.wrappedValue.dismiss()
       }, label: {

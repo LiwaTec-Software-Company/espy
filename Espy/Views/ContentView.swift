@@ -9,141 +9,8 @@ import SwiftUI
 import MarkdownUI
 
 
-struct EntryRow: View {
-  @EnvironmentObject var contentManager: ContentManager
-
-  var entry: Entry
-  var action: () -> Void
-  var secondaryAction: () -> Void
-  var thirdAction: () -> Void
-
-  var isSelected: Bool {
-    get {
-      contentManager.isEntrySelected(entry)
-    }
-  }
-
-  @State private var degrees: Double = 0
-  @State private var scale: CGFloat = 1.0
-  @State private var viewState = CGSize.zero
-  @State private var translation: CGSize = .zero
-  @State private var canBeDragged: Bool = true
-
-  var body: some View {
-    // tap > dtap > long
-    let longTapGesture = LongPressGesture(minimumDuration: 0.5).onEnded { _ in
-      secondaryAction()
-    }
-    
-    let doubleTapGesture = TapGesture(count: 2).onEnded { _ in
-      thirdAction()
-    }
 
 
-    let tapGesture = TapGesture().onEnded { _ in
-      action()
-    }
-
-    let longAndTap = tapGesture.exclusively(before: longTapGesture)
-
-    let tapBeforeDoubleGesture = longAndTap.sequenced(before: doubleTapGesture)
-
-    Button(action: {}) {
-      HStack {
-        VStack(alignment: .leading, spacing: 2) {
-          HStack(alignment: .firstTextBaseline) {
-            Text(entry.createdAt.shortString())
-              .font(.caption).foregroundColor(.accentColor)
-            Spacer()
-            Text(entry.updatedAt.shortString())
-              .font(.caption).foregroundColor(.gray)
-          }
-
-          VStack(alignment: .leading) {
-            if contentManager.isEditModeOn {
-              Text(entry.contents).font(.callout)
-            } else {
-              let markdownLines: [MarkdownLine] = entry.formatted.components(separatedBy: .newlines).map { line in
-                return MarkdownLine(line: line)
-              }
-              ForEach(markdownLines, id: \.self) { (markdownLine: MarkdownLine) in
-                markdownLine
-              }
-            }
-          }
-
-        }
-      }
-      .frame(maxWidth: .infinity, maxHeight: .infinity).padding().background(Color.black)
-      .gesture(tapBeforeDoubleGesture)
-    }
-    .overlay(
-      RoundedRectangle(cornerRadius: 10)
-        .stroke(isSelected ? Color.accentColor : Color.gray, lineWidth: isSelected ? 4 : contentManager.isMultiSelectOn ? 1 : 0)
-    )
-    .offset(
-      x: viewState.width + translation.width,
-      y: viewState.height + translation.height
-    )
-    //    .gesture(magnificationAndDragGesture).rotationEffect(Angle(degrees: degrees)).scaleEffect(scale).animation(.easeInOut)
-  }
-}
-
-struct TrashButton: View {
-  @EnvironmentObject var contentManager: ContentManager
-
-  var onPress: () -> Void
-
-  var body: some View {
-    HStack{
-      Button(action: {
-        onPress()
-      }, label: {
-        Image(systemName: contentManager.isAnythingSelected ? "trash.fill": "trash")
-          .font(Font.system(size: (contentManager.isAnythingSelected || contentManager.isMultiSelectOn) ? 25 : 20))
-          .foregroundColor(contentManager.isAnythingSelected ? .red : .gray)
-        Text("")
-      }).disabled(!(contentManager.isMultiSelectOn || contentManager.isAnythingSelected ))
-    }
-  }
-}
-
-struct EditModeButton: View {
-  @EnvironmentObject var contentManager: ContentManager
-
-  var body: some View {
-    HStack{
-      Button(action: {
-        contentManager.isEditModeOn.toggle()
-      }, label: {
-        Image(systemName: contentManager.isEditModeOn ? "doc.richtext" : "doc.richtext.fill")
-          .font(Font.system(size: 25))
-          .foregroundColor(.accentColor)
-        Text("")
-      })
-    }
-  }
-}
-
-
-struct BlockModeButton: View {
-  @EnvironmentObject var contentManager: ContentManager
-
-  var onPress: () -> Void
-
-  var body: some View {
-    HStack{
-      Button(action: {
-        onPress()
-      }, label: {
-        Image(systemName: (contentManager.isEverythingSelected && contentManager.isMultiSelectOn) ? "xmark.circle.fill" : contentManager.isMultiSelectOn ? "rectangle.grid.1x2.fill" : "rectangle.grid.1x2")
-          .font(Font.system(size: 25))
-          .foregroundColor(.accentColor)
-        Text("")
-      })
-    }
-  }
-}
 
 struct ContentView: View {
   @ObservedObject private var mainManager: MainManager = MainManager.shared
@@ -234,7 +101,7 @@ struct ContentView: View {
           }) {
             Image(systemName: "folder")
           }.sheet(isPresented: $isShowingDocSheet, content: {
-            DocumentPicker { url in
+            DocumentPickerView { url in
               self.editViewFromDocSheet = EditView(url: url)
               isShowingDocEntrySheet.toggle()
             }.onDisappear {

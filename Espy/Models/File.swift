@@ -64,9 +64,9 @@ struct File: Model {
     }
   }
 
-  init(name: String, contents: String = "") {
+  init(name: String, contents: String?) {
     let url = LocalManager.asMarkdown(name: name)
-    self.init(name: name, url: url, createdAt: nil, updatedAt: nil, tagMap: nil, contents: nil)
+    self.init(name: name, url: url, createdAt: nil, updatedAt: nil, tagMap: nil, contents: contents)
   }
 
   func extractEntryId() -> UUID? {

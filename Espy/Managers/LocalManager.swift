@@ -40,9 +40,10 @@ class LocalManager: ObservableObject  {
   }
 
   // CREATE
-  func create(file: File, write contents: String = "") -> File {
+  func create(file: File, write contents: String?) -> File {
+    let contentsToWrite = contents ?? file.contents
     do {
-      try contents.write(to: file.url, atomically: true, encoding: .utf8)
+      try contentsToWrite.write(to: file.url, atomically: true, encoding: .utf8)
     }
     catch {
       print("Unable to add this entry.")
@@ -52,9 +53,9 @@ class LocalManager: ObservableObject  {
     return file
   }
 
-  func createFile(name: String, write contents: String = "") -> File {
+  func createFile(name: String, write contents: String?) -> File {
     let file = File(name: name, contents: contents)
-    return create(file: file)
+    return create(file: file, write: nil)
   }
 
   func getFile(with url: URL) -> File {
@@ -115,10 +116,10 @@ class LocalManager: ObservableObject  {
   func update(_ file: File, canCreateNew: Bool = true) {
     if doesFileExist(file.url) {
       delete(file: file)
-      let _ = create(file: file)
+      let _ = create(file: file, write: file.contents)
     }
     if canCreateNew {
-      let _ = create(file: file)
+      let _ = create(file: file, write: file.contents)
     }
   }
 
