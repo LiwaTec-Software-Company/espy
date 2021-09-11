@@ -63,7 +63,7 @@ struct EntryRow: View {
                 markdownLine.multilineTextAlignment(.leading)
               }
             }
-          }.padding()
+          }
         }
       }
       .frame(maxWidth: .infinity, maxHeight: .infinity).padding().background(Color.black)
