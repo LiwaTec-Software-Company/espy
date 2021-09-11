@@ -129,6 +129,14 @@ struct ContentView: View {
           ExportButton()
         }
       }
+      VStack {
+        Button("press me to open something cool") {
+          isShowingDocSheet.toggle()
+        }
+        Button("press me to open something cool") {
+          isShowingDocSheet.toggle()
+        }
+      }
     }
     .environmentObject(mainManager)
     .environmentObject(entryManager)
