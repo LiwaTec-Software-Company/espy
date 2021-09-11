@@ -56,14 +56,6 @@ struct EditView: View {
     VStack(alignment: .center, spacing: 4.0, content: {
       // Header
       HStack {
-        EditModeButton()
-        Spacer()
-        VStack(alignment: .center, spacing: 1) {
-          Text(selectedEntry.createdAt.displayDate()).padding(5).font(.title3).foregroundColor(isNew ? .green : .primary)
-          Text(selectedEntry.id.uuidString).padding(0).font(.caption).foregroundColor(isNew ? .green : .gray)
-          Text(currentDate.formattedStringDate()).padding(5).font(.caption).foregroundColor((isTextUpdated || isNew) ? .green : .gray)
-        }
-        Spacer()
         TrashButton(onPress: {
           if (!isNew) {
             contentManager.unselect(selectedEntry)
@@ -71,6 +63,10 @@ struct EditView: View {
             presentationMode.wrappedValue.dismiss()
           }
         })
+        Spacer()
+        Text(selectedEntry.createdAt.displayDate()).padding(5).font(.title3).foregroundColor(isNew ? .green : .primary)
+        Spacer()
+        EditModeButton()
       }
 
       TextEditor(text: $fullText).cornerRadius(10).padding(10).onChange(of: fullText, perform: { value in
@@ -79,19 +75,32 @@ struct EditView: View {
       })
 
       // Footer
-      Button(action: {
-        let entry = Entry(entry: selectedEntry, contents: fullText)
-        if isNew {
-          mainManager.add(entry: entry)
-        } else if isTextUpdated {
-          mainManager.update(entry: entry)
+      VStack {
+        VStack(alignment: .center, spacing: 1) {
+          Text(selectedEntry.id.uuidString).padding(0).font(.subheadline).foregroundColor(isNew ? .green : .gray)
+          Text(currentDate.formattedStringDate()).padding(5).font(.caption).foregroundColor((isTextUpdated || isNew) ? .green : .gray)
         }
-        contentManager.unselect(selectedEntry)
-        presentationMode.wrappedValue.dismiss()
-      }, label: {
-        Image(systemName: "chevron.compact.down")
-          .font(.system(size: 44.0, weight: .bold)).foregroundColor((isTextUpdated || isNew) ? .green : .accentColor)
-      })
+        HStack {
+          ExportButton()
+          Spacer()
+          Button(action: {
+            let entry = Entry(entry: selectedEntry, contents: fullText)
+            if isNew {
+              mainManager.add(entry: entry)
+            } else if isTextUpdated {
+              mainManager.update(entry: entry)
+            }
+            contentManager.unselect(selectedEntry)
+            presentationMode.wrappedValue.dismiss()
+          }, label: {
+            Image(systemName: "chevron.compact.down")
+              .font(.system(size: 44.0, weight: .bold)).foregroundColor((isTextUpdated || isNew) ? .green : .accentColor)
+          })
+          Spacer()
+          ExportButton()
+        }
+      }
+
       .padding(20)
     })
     .onAppear(perform: {

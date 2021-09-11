@@ -26,7 +26,6 @@ public extension UIImage {
 
       guard let ciImg = CIImage(image: self) else { return nil }
 
-
       let blur = CIFilter(name: "CIGaussianBlur")
       blur?.setValue(ciImg, forKey: kCIInputImageKey)
       blur?.setValue(radius, forKey: kCIInputRadiusKey)

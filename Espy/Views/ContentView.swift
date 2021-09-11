@@ -6,11 +6,6 @@
 //
 
 import SwiftUI
-import MarkdownUI
-
-
-
-
 
 struct ContentView: View {
   @ObservedObject private var mainManager: MainManager = MainManager.shared
@@ -33,11 +28,11 @@ struct ContentView: View {
   @State var editViewFromDocSheet: EditView?
 
   init() {
-    let barBackgroundImage = UIImage(color: UIColor(hue: 0, saturation: 1, brightness: 0, alpha: 0.7))
-    UINavigationBar.appearance().barTintColor = .clear
-    UINavigationBar.appearance().setBackgroundImage(barBackgroundImage, for: .default)
-    UIToolbar.appearance().barTintColor = .clear
-    UIToolbar.appearance().setBackgroundImage(barBackgroundImage, forToolbarPosition: .any, barMetrics: .default)
+//    let barBackgroundImage = UIImage(color: UIColor(hue: 0, saturation: 1, brightness: 0, alpha: 0.7))
+//    UINavigationBar.appearance().barTintColor = .clear
+//    UINavigationBar.appearance().setBackgroundImage(barBackgroundImage, for: .default)
+//    UIToolbar.appearance().barTintColor = .clear
+//    UIToolbar.appearance().setBackgroundImage(barBackgroundImage, forToolbarPosition: .any, barMetrics: .default)
   }
 
   var body: some View {
@@ -69,7 +64,7 @@ struct ContentView: View {
         isShowingBottomSheet = true
       }
       .toolbar {
-        ToolbarItem(placement: .destructiveAction) {
+        ToolbarItem(placement: .navigationBarLeading) {
           TrashButton(onPress: {
             if contentManager.isMultiSelectOn {
               deleteAllSelectedEntries()
@@ -91,7 +86,7 @@ struct ContentView: View {
           })
         }
 
-        ToolbarItem(placement: .navigationBarLeading) {
+        ToolbarItem(placement: .navigationBarTrailing) {
           EditModeButton()
         }
 
@@ -132,9 +127,7 @@ struct ContentView: View {
             Text("")
           }
           Spacer()
-          NavigationLink(destination: ExportView()) {
-            Image(systemName: contentManager.isMultipleSelected ? "arrowshape.turn.up.right.fill" : "arrowshape.turn.up.right.fill")
-          }
+          ExportButton()
         }
       }
     }
@@ -178,19 +171,4 @@ struct ContentView_Previews: PreviewProvider {
 }
 
 
-struct MarkdownLine: View, Identifiable, Hashable {
-  @State var line: String = ""
-  let id: UUID = UUID()
 
-  var body: some View {
-    Markdown("\(line)").disabled(true)
-  }
-
-  static func == (lhs: MarkdownLine, rhs: MarkdownLine) -> Bool {
-    return lhs.id == rhs.id && lhs.line == rhs.line
-  }
-
-  func hash(into hasher: inout Hasher) {
-    hasher.combine(id)
-  }
-}
