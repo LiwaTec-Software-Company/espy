@@ -132,9 +132,7 @@ struct ContentView: View {
             Text("")
           }
           Spacer()
-          Button(action: {
-            ExportView()
-          }) {
+          NavigationLink(destination: ExportView()) {
             Image(systemName: contentManager.isMultipleSelected ? "arrowshape.turn.up.right.fill" : "arrowshape.turn.up.right.fill")
           }
         }

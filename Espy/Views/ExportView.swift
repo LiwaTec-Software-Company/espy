@@ -10,7 +10,12 @@ import SwiftUI
 /// View that let's you choose which file format you wish to export to.
 struct ExportView: View {
     var body: some View {
-        Text("Export View")
+      VStack {
+        Text("WIEO")
+        Text("WIEO")
+        Text("WIEO")
+        Text("WIEO")
+      }
     }
 }
 
