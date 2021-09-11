@@ -9,6 +9,9 @@ import SwiftUI
 
 struct EditView: View {
   @Environment(\.presentationMode) var presentationMode
+  @EnvironmentObject var mainManager: MainManager
+  @EnvironmentObject var contentManager: ContentManager
+  @EnvironmentObject var entryManger: EntryManager
 
   @State var fullText: String = "# "
   @State var isTextUpdated: Bool = false
@@ -33,20 +36,16 @@ struct EditView: View {
     self.selectedEntry = entry
 
     self.isNew = isNew
-    _fullText = State(initialValue: selectedEntry.content)
+    _fullText = State(initialValue: selectedEntry.contents)
     originalText = self.fullText
   }
 
-  init(file: URL) {
-    if let entry = LocalManager.shared.getLocalEntry(with: file) {
-      self.init(entry)
-    } else {
-      self.init()
-    }
+  init(url: URL) {
+    self.init(MainManager.shared.getEntry(with: url))
   }
 
   init(id: UUID, isNew: Bool = false) {
-    if let entry = EntryManager.shared.getEntry(with: id) {
+    if let entry = MainManager.shared.getEntry(with: id) {
       self.init(entry, isNew: isNew)
     } else {
       self.init()
@@ -55,19 +54,20 @@ struct EditView: View {
 
   var body: some View {
     VStack(alignment: .center, spacing: 4.0, content: {
+      // Header
       HStack {
         EditModeButton()
         Spacer()
         VStack(alignment: .center, spacing: 1) {
-          Text(selectedEntry.date.displayDate()).padding(5).font(.title3).foregroundColor(isNew ? .green : .primary)
+          Text(selectedEntry.createdAt.displayDate()).padding(5).font(.title3).foregroundColor(isNew ? .green : .primary)
           Text(selectedEntry.id.uuidString).padding(0).font(.caption).foregroundColor(isNew ? .green : .gray)
           Text(currentDate.formattedStringDate()).padding(5).font(.caption).foregroundColor((isTextUpdated || isNew) ? .green : .gray)
         }
         Spacer()
         TrashButton(onPress: {
           if (!isNew) {
-            ContentManager.shared.unselect(selectedEntry)
-            LocalManager.shared.deleteEntryAndFile(selectedEntry)
+            contentManager.unselect(selectedEntry)
+            mainManager.delete(entry: selectedEntry)
             presentationMode.wrappedValue.dismiss()
           }
         })
@@ -78,16 +78,15 @@ struct EditView: View {
         currentDate = Date()
       })
 
+      // Footer
       Button(action: {
-        let entry = Entry(entry: selectedEntry, content: fullText)
-
+        let entry = Entry(entry: selectedEntry, contents: fullText)
         if isNew {
-          LocalManager.shared.createFileFor(entry)
+          mainManager.add(entry: entry)
         } else if isTextUpdated {
-          LocalManager.shared.updateEntryAndFile(with: selectedID)
+          mainManager.update(entry: entry)
         }
-
-        ContentManager.shared.unselect(selectedEntry)
+        contentManager.unselect(selectedEntry)
         presentationMode.wrappedValue.dismiss()
       }, label: {
         Image(systemName: "chevron.compact.down")
@@ -97,7 +96,7 @@ struct EditView: View {
     })
     .onAppear(perform: {
       if (!isNew) {
-        ContentManager.shared.select(selectedEntry)
+        contentManager.select(selectedEntry)
       }
     })
   }
