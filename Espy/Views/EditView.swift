@@ -91,7 +91,9 @@ struct EditView: View {
           Text(currentDate.formattedStringDate()).padding(5).font(.caption).foregroundColor((isTextUpdated || isNew) ? .green : .gray)
         }
         HStack {
-          ExportButton()
+          ImportButton(onPress: {
+            print("eh")
+          })
           Spacer()
           Button(action: {
             let entry = Entry(entry: selectedEntry, contents: fullText)

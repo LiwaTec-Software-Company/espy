@@ -92,11 +92,9 @@ struct ContentView: View {
         }
 
         ToolbarItemGroup(placement: .bottomBar) {
-          Button(action: {
+          ImportButton(onPress: {
             isShowingDocSheet.toggle()
-          }) {
-            Image(systemName: "folder")
-          }.sheet(isPresented: $isShowingDocSheet, content: {
+          }).sheet(isPresented: $isShowingDocSheet, content: {
             DocumentPickerView { url in
               self.editViewFromDocSheet = EditView(url: url)
               isShowingDocEntrySheet.toggle()

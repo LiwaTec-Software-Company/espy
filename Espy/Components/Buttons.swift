@@ -68,10 +68,24 @@ struct ExportButton: View {
 
   var body: some View {
     NavigationLink(destination: ExportView()) {
-      Image(systemName: contentManager.isMultipleSelected ? "arrowshape.turn.up.right.fill" : "arrowshape.turn.up.right.fill")
+      Image(systemName: contentManager.isMultipleSelected ? "rectangle.portrait.and.arrow.right.fill" : "rectangle.portrait.and.arrow.right")
     }
   }
 }
+
+struct ImportButton: View {
+  @EnvironmentObject var contentManager: ContentManager
+  var onPress: () -> Void
+
+  var body: some View {
+    Button(action: {
+      onPress()
+    }, label: {
+      Image(systemName: contentManager.isMultipleSelected ? "square.and.arrow.down.on.square.fill" : contentManager.isAnythingSelected ? "square.and.arrow.down.fill" : "folder.badge.gearshape")
+    })
+  }
+}
+
 
 struct Buttons: View {
     var body: some View {
