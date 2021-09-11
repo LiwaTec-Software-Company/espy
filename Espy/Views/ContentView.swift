@@ -135,7 +135,7 @@ struct ContentView: View {
           Button(action: {
             print("Edit button was tapped")
           }) {
-            Image(systemName: contentManager.isMultipleSelected ? "paperplane.fill" : "paperplane")
+            Image(systemName: contentManager.isMultipleSelected ? "arrowshape.turn.up.right.fill" : "arrowshape.turn.up.right.fill")
           }
         }
       }
