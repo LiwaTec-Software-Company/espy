@@ -54,6 +54,7 @@ struct EditView: View {
 
   var body: some View {
     VStack(alignment: .center, spacing: 4.0, content: {
+      // Header
       HStack {
         EditModeButton()
         Spacer()
@@ -77,9 +78,9 @@ struct EditView: View {
         currentDate = Date()
       })
 
+      // Footer
       Button(action: {
         let entry = Entry(entry: selectedEntry, contents: fullText)
-
         if isNew {
           mainManager.add(entry: entry)
         } else if isTextUpdated {

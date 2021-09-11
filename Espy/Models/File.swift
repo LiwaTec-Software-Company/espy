@@ -42,12 +42,7 @@ struct File: Model {
   init() {
     self.name = createdAt.formattedStringDate()
     self.url = LocalManager.asMarkdown(name: self.name)
-    let createdAtTag = Tag(.createdAt, createdAt.formattedStringDate())
-    let updatedAtTag = Tag(.updatedAt, updatedAt.formattedStringDate())
-
-    self.tagMap[.createdAt] = createdAtTag
-    self.tagMap[.updatedAt] = updatedAtTag
-
+    self.tagMap = File.defaultTagMap
     self.contents = "# \(createdAt)\n\(formattedStringTags())"
   }
 
@@ -59,9 +54,7 @@ struct File: Model {
     self.createdAt = createdAt ?? Date()
     self.updatedAt = updatedAt ?? self.createdAt
     self.contents = contents ?? "# \(self.createdAt.formattedStringDate()) "
-    if tagMap != nil {
-      self.tagMap = tagMap!
-    }
+    self.tagMap = tagMap ?? File.defaultTagMap
   }
 
   init(name: String, contents: String?) {
