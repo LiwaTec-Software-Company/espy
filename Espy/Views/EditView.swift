@@ -7,15 +7,19 @@
 
 import SwiftUI
 
+@available(iOS 15.0, *)
 struct EditView: View {
   @Environment(\.presentationMode) var presentationMode
   @EnvironmentObject var mainManager: MainManager
   @EnvironmentObject var contentManager: ContentManager
   @EnvironmentObject var entryManger: EntryManager
 
+  @FocusState private var isEditingText: Bool
   @State var fullText: String = "# "
   @State var isTextUpdated: Bool = false
   @State private var currentDate: Date = Date()
+
+  @State private var activeFont: UIFont = .systemFont(ofSize: 18, weight: .regular)
 
   private var originalText: String = ""
 
@@ -29,7 +33,9 @@ struct EditView: View {
 
   var isNew = true
 
-  init() {}
+  init() {
+    isEditingText = isNew
+  }
 
   init(_ entry: Entry, isNew: Bool = false) {
     self.init()
@@ -69,10 +75,14 @@ struct EditView: View {
         EditModeButton()
       }
 
-      TextEditor(text: $fullText).cornerRadius(10).padding(10).onChange(of: fullText, perform: { value in
+      QuickTextEditor(text: $fullText, activeFont: $activeFont, placeholder: "# Untitled") { value in
         isTextUpdated = fullText != originalText
         currentDate = Date()
-      })
+      }
+      .focused($isEditingText)
+      .cornerRadius(10)
+      .padding(10)
+
 
       // Footer
       VStack {
@@ -90,6 +100,7 @@ struct EditView: View {
             } else if isTextUpdated {
               mainManager.update(entry: entry)
             }
+
             contentManager.unselect(selectedEntry)
             presentationMode.wrappedValue.dismiss()
           }, label: {
@@ -106,13 +117,14 @@ struct EditView: View {
     .onAppear(perform: {
       if (!isNew) {
         contentManager.select(selectedEntry)
-      }
+      } 
     })
   }
 }
 
+@available(iOS 15.0, *)
 struct EditView_Previews: PreviewProvider {
-    static var previews: some View {
+  static var previews: some View {
         EditView()
     }
 }

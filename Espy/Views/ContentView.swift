@@ -7,16 +7,17 @@
 
 import SwiftUI
 
+@available(iOS 15.0, *)
 struct ContentView: View {
-  @ObservedObject private var mainManager: MainManager = MainManager.shared
-  @ObservedObject private var contentManager = MainManager.shared.contentManager
-  @ObservedObject private var entryManager = MainManager.shared.entryManager
-
+  @StateObject private var mainManager: MainManager = MainManager.shared
+  @StateObject private var contentManager = MainManager.shared.contentManager
+  @StateObject private var entryManager = MainManager.shared.entryManager
 
   @State private var isShowingEntrySheet = false
   @State private var isShowingBottomSheet = true
   @State private var isShowingDocSheet = false
   @State private var isShowingDocEntrySheet = false
+  
 
   @State private var currentEntry: Entry?
 
@@ -164,6 +165,7 @@ struct ContentView: View {
   }
 }
 
+@available(iOS 15.0, *)
 struct ContentView_Previews: PreviewProvider {
   static var previews: some View {
     ContentView()
