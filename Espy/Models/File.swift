@@ -105,4 +105,13 @@ extension File {
   mutating func set(name: TagName, to value: String) {
     self.tagMap[name] = Tag(name, value)
   }
+
+  func withUpdated(contents: String) -> File {
+    return File(name: self.name,
+                url: self.url,
+                createdAt: self.createdAt,
+                updatedAt: self.updatedAt,
+                tagMap: self.tagMap,
+                contents: contents)
+  }
 }

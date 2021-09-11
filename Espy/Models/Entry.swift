@@ -64,6 +64,7 @@ struct Entry: Model {
     self.createdAt = entry.createdAt
     self.updatedAt = Date()
     self.contents = contents
+    self.file = entry.file.withUpdated(contents: contents)
   }
 
   mutating func set(file: File) {
