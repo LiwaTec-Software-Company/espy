@@ -48,11 +48,10 @@ struct EntryRow: View {
           HStack(alignment: .firstTextBaseline) {
             Text(entry.createdAt.shortString())
               .font(.caption).foregroundColor(.accentColor)
-            Spacer()
+            Text("<")
             Text(entry.updatedAt.shortString())
               .font(.caption).foregroundColor(.gray)
           }
-
           VStack(alignment: .leading) {
             if contentManager.isEditModeOn {
               Text(entry.contents).font(.callout)
@@ -64,7 +63,7 @@ struct EntryRow: View {
                 markdownLine.multilineTextAlignment(.leading)
               }
             }
-          }
+          }.padding()
         }
       }
       .frame(maxWidth: .infinity, maxHeight: .infinity).padding().background(Color.black)
