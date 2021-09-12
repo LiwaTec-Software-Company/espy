@@ -29,18 +29,9 @@ struct EntryRow: View {
   @State private var canBeDragged: Bool = true
 
   var body: some View {
-    // tap > dtap > long
-    let longTapGesture = LongPressGesture(minimumDuration: 0.5).onEnded { _ in
-      secondaryAction()
-    }
-    let doubleTapGesture = TapGesture(count: 2).onEnded { _ in
-      thirdAction()
-    }
     let tapGesture = TapGesture().onEnded { _ in
       action()
     }
-    let longAndTap = tapGesture.exclusively(before: longTapGesture)
-    let tapBeforeDoubleGesture = longAndTap.sequenced(before: doubleTapGesture)
 
     Button(action: {}) {
       HStack {
@@ -56,8 +47,8 @@ struct EntryRow: View {
           if contentManager.isEditModeOn {
             Text(entry.contents)
               .font(.callout)
-              .multilineTextAlignment(.leading)
               .foregroundColor(.gray)
+              .multilineTextAlignment(.leading)
           } else {
             let markdownLines: [MarkdownLine] = entry.formatted.components(separatedBy: .newlines).map { line in
               return MarkdownLine(line: line)
@@ -71,8 +62,10 @@ struct EntryRow: View {
           }
         }
       }
-      .frame(maxWidth: .infinity, maxHeight: .infinity).padding().background(Color.black)
-      .gesture(tapBeforeDoubleGesture)
+      .frame(maxWidth: .infinity, maxHeight: .infinity)
+      .padding()
+      .background(Color.black)
+      .gesture(tapGesture)
     }
     .overlay(
       RoundedRectangle(cornerRadius: 10)

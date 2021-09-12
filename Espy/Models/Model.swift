@@ -7,7 +7,7 @@
 
 import Foundation
 
-protocol Model: Identifiable, Hashable, Comparable {
+protocol Model: Identifiable, Comparable {
   associatedtype T
   var id: UUID { get set }
   var createdAt: Date  { get set }

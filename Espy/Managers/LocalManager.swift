@@ -74,12 +74,12 @@ class LocalManager: ObservableObject  {
     let createdAt = attributes?[FileAttributeKey.creationDate] as? Date
     let updatedAt = attributes?[FileAttributeKey.modificationDate] as? Date
     let contents = getContentsFrom(file: url)
-    let metaTagMap = getMetaTags(from: contents ?? "")
+    let metaTagMap = getTags(from: contents ?? "")
 
     return File(name: name, url: url, createdAt: createdAt, updatedAt: updatedAt, tagMap: metaTagMap, contents: contents)
   }
 
-  func getMetaTags(from contents: String) -> [TagName: Tag] {
+  func getTags(from contents: String) -> [TagName: Tag] {
     var tagMap = [TagName: Tag]()
     guard let metaBlockRange = Meta.regex.getMatchRange(in: contents) else {
       return tagMap
