@@ -26,7 +26,7 @@ struct EntryRow: View {
   @State private var scale: CGFloat = 1.0
   @State private var viewState = CGSize.zero
   @State private var translation: CGSize = .zero
-  @State private var canBeDragged: Bool = true
+  @State private var canBeDragged: Bool = false
 
   var body: some View {
     let tapGesture = TapGesture().onEnded { _ in
@@ -70,6 +70,7 @@ struct EntryRow: View {
     .overlay(
       RoundedRectangle(cornerRadius: 10)
         .stroke(isSelected ? Color.accentColor : Color.gray, lineWidth: isSelected ? 4 : contentManager.isMultiSelectOn ? 1 : 0)
+
     )
     .offset(
       x: viewState.width + translation.width,

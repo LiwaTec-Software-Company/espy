@@ -84,34 +84,39 @@ struct EditView: View {
         .cornerRadius(10)
         .padding(10)
           // Footer
-        VStack {
-          VStack(alignment: .center, spacing: 1) {
-            Text(selectedEntry.id.uuidString).padding(0).font(.subheadline).foregroundColor(isNew ? .green : .gray)
-            Text(currentDate.formattedStringDate()).padding(5).font(.caption).foregroundColor((isTextUpdated || isNew) ? .green : .gray)
-          }
+        VStack(alignment: .center) {
+          Text(selectedEntry.id.uuidString).font(.subheadline).foregroundColor(isNew ? .green : .gray).lineLimit(1)
           HStack {
             ImportButton(onPress: {
               print("eh")
             })
-            Spacer()
-            Button(action: {
-              if isNew {
-                self.selectedEntry.update(with: fullText)
-                mainManager.add(entry: selectedEntry)
-              } else if isTextUpdated {
-                mainManager.update(entry: selectedEntry, with: fullText)
-              }
-              contentManager.unselect(selectedEntry)
-              presentationMode.wrappedValue.dismiss()
-            }, label: {
-              Image(systemName: "chevron.compact.down")
-                .font(.system(size: 44.0, weight: .bold)).foregroundColor((isTextUpdated || isNew) ? .green : .accentColor)
-            })
-            Spacer()
+            VStack(alignment: .center, spacing: 1) {
+              Text(currentDate.formattedStringDate()).font(.caption).foregroundColor((isTextUpdated || isNew) ? .green : .gray)
+              Button(action: {
+                if isNew {
+                  self.selectedEntry.update(with: fullText)
+                  mainManager.add(entry: selectedEntry)
+                } else if isTextUpdated {
+                  mainManager.update(entry: selectedEntry, with: fullText)
+                }
+                contentManager.unselect(selectedEntry)
+                presentationMode.wrappedValue.dismiss()
+              }, label: {
+                Image(systemName: "chevron.compact.down")
+                  .font(.system(size: 44.0, weight: .bold)).foregroundColor((isTextUpdated || isNew) ? .green : .accentColor)
+              })
+                .padding(10)
+            }
+            .frame(maxWidth: .infinity)
+
             ExportButton()
           }
         }
-        .padding(20)
+        .padding(10)
+        .background(Color.black.opacity(0.5))
+        .cornerRadius(10)
+        .padding(10)
+
       }
     })
       .onAppear(perform: {

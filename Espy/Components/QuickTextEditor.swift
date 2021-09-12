@@ -89,6 +89,7 @@ struct QuickTextEditor: UIViewRepresentable {
       textView.text = placeholder
     }
     textView.textColor = .systemGray
+    textView.contentInset = UIEdgeInsets(top: 20, left: 0, bottom: 120, right: 0)
     textView.delegate = context.coordinator
     textView.font = activeFont
     context.coordinator.setActive(textView: textView)
