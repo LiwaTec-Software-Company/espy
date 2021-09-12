@@ -115,8 +115,21 @@ struct ContentView: View {
             Button(action: {
               isShowingBottomSheet.toggle()
             }) {
-              Image(systemName: "chevron.compact.up")
-                .font(.system(size: 44.0, weight: .bold))
+              if contentManager.isMultipleSelected {
+                ZStack {
+                  Image(systemName: "chevron.compact.up")
+                    .font(.system(size: 44))
+                  Image(systemName: "chevron.compact.up")
+                    .font(.system(size: 44)).offset(x: 0, y: 10)
+                }
+              } else if contentManager.isAnythingSelected {
+                Image(systemName: "chevron.compact.up")
+                  .font(.system(size: 44, weight: .bold))
+              } else {
+                Image(systemName: "chevron.compact.up")
+                  .font(.system(size: 44, weight: .bold)).foregroundColor(.green)
+              }
+
             }
             .sheet(isPresented: $isShowingBottomSheet) {
               EditView().onDisappear {

@@ -7,7 +7,7 @@
 
 import Foundation
 
-class ContentManager: ObservableObject {
+class ContentManager: ObservableObject, Identifiable {
   static let shared = ContentManager()
   @Published var isMultiSelectOn: Bool = false
   @Published var isEditModeOn: Bool = false
