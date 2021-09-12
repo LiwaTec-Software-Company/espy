@@ -32,7 +32,7 @@ class Entry: Model {
     self.updatedAt = file.updatedAt
     self.file = file
     self.contents = file.contents
-    if let idFromFile = file.extractEntryId() {
+    if let idFromFile = file.getIdTagUUID() {
       self.id = idFromFile
     }
   }
@@ -76,8 +76,15 @@ extension Entry {
     self.updatedAt = Date()
   }
 
+  func update(with file: File) {
+    self.contents = file.contents
+    set(file: file)
+    self.updatedAt = Date()
+  }
+
   func set(file: File) {
     self.file = file
+    self.contents = file.contents
   }
 
   static func < (lhs: Entry, rhs: Entry) -> Bool {

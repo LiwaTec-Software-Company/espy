@@ -40,9 +40,9 @@ extension MainManager {
     var file = entry.file
     file.set(name: .id, to: entry.id.uuidString)
 
-    let formattedContents = entry.contents + "\n" + file.formattedStringTags()
+    let formattedContents = entry.getContentsWithoutMeta() + "\n\n" + file.formattedStringTags()
     let newFile = localManager.create(file: entry.file, write: formattedContents)
-    entry.file = newFile
+    entry.set(file: newFile)
   }
 
   // READ
@@ -74,15 +74,15 @@ extension MainManager {
 
   func getEntry(with url: URL) -> Entry {
     let file = localManager.getFile(with: url)
-    guard let entryId = file.extractEntryId(),
-    let entry = entryManager.getEntry(with: entryId) else {
-      return Entry(file: file)
+    if let entryId = file.getIdTagUUID(),
+       let entry = entryManager.getEntry(with: entryId) {
+      return entry
     }
-    return entry
+    return Entry(file: file)
   }
 
   func getEntry(with file: File) -> Entry {
-    guard let entryId = file.extractEntryId(),
+    guard let entryId = file.getIdTagUUID(),
     let entry = entryManager.getEntry(with: entryId) else {
       return Entry(file: file)
     }
@@ -126,7 +126,6 @@ extension MainManager {
       if let entry = getEntry(with: id) {
         entryManager.removeEntry(with: id)
         localManager.delete(file: entry.file)
-        
       }
     }
   }

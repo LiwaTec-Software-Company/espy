@@ -48,9 +48,9 @@ class LocalManager: ObservableObject  {
     catch {
       print("Unable to add this entry.")
     }
-
-    idMap[file.id] = file
-    return file
+    let newFile = file.withUpdated(contents: contentsToWrite)
+    idMap[newFile.id] = newFile
+    return newFile
   }
 
   func createFile(name: String, write contents: String?) -> File {

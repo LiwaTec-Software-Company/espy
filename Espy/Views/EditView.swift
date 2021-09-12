@@ -42,7 +42,7 @@ struct EditView: View {
     self.selectedEntry = entry
 
     self.isNew = isNew
-    _fullText = State(initialValue: selectedEntry.contents)
+    _fullText = State(initialValue: selectedEntry.getContentsWithoutMeta())
     originalText = self.fullText
   }
 

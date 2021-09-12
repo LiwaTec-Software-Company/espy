@@ -43,6 +43,7 @@ struct File: Model {
     self.name = createdAt.formattedStringDate()
     self.url = LocalManager.asMarkdown(name: self.name)
     self.tagMap = File.defaultTagMap
+    self.tagMap[.id] = Tag(.id, self.id.uuidString)
     self.contents = "# \(createdAt)\n\(formattedStringTags())"
   }
 
@@ -55,22 +56,11 @@ struct File: Model {
     self.updatedAt = updatedAt ?? self.createdAt
     self.contents = contents ?? "# \(self.createdAt.formattedStringDate()) "
     self.tagMap = tagMap ?? File.defaultTagMap
-    if let fileIdTag = tagMap![.id],
-      let uuid = UUID(uuidString: fileIdTag.value) {
-      self.id = uuid
-    } else {
-      self.tagMap[.id] = Tag(.id, self.id.uuidString)
-    }
   }
 
   init(name: String, contents: String?) {
     let url = LocalManager.asMarkdown(name: name)
     self.init(name: name, url: url, createdAt: nil, updatedAt: nil, tagMap: nil, contents: contents)
-  }
-
-  func extractEntryId() -> UUID? {
-    guard let lastLine = contents.split(whereSeparator: \.isNewline).last else { return nil }
-    return UUID(uuidString: String(lastLine))
   }
 
   func formattedStringTags() -> String {
@@ -113,5 +103,13 @@ extension File {
                 updatedAt: self.updatedAt,
                 tagMap: self.tagMap,
                 contents: contents)
+  }
+
+  func getIdTagUUID() -> UUID? {
+    if let idTag = tagMap[.id],
+       let uuid = UUID(uuidString: idTag.value) {
+      return uuid
+    }
+    return nil
   }
 }
