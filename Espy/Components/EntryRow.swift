@@ -52,15 +52,19 @@ struct EntryRow: View {
             Text(entry.updatedAt.shortString())
               .font(.caption).foregroundColor(.gray)
           }
-          VStack(alignment: .leading) {
-            if contentManager.isEditModeOn {
-              Text(entry.contents).font(.callout)
-            } else {
-              let markdownLines: [MarkdownLine] = entry.formatted.components(separatedBy: .newlines).map { line in
-                return MarkdownLine(line: line)
-              }
+
+          if contentManager.isEditModeOn {
+            Text(entry.contents)
+              .font(.callout)
+              .multilineTextAlignment(.leading)
+          } else {
+            let markdownLines: [MarkdownLine] = entry.formatted.components(separatedBy: .newlines).map { line in
+              return MarkdownLine(line: line)
+            }
+            VStack(alignment: .leading) {
               ForEach(markdownLines, id: \.self) { (markdownLine: MarkdownLine) in
-                markdownLine.multilineTextAlignment(.leading)
+                markdownLine
+                  .multilineTextAlignment(.leading)
               }
             }
           }
@@ -77,6 +81,5 @@ struct EntryRow: View {
       x: viewState.width + translation.width,
       y: viewState.height + translation.height
     )
-    //    .gesture(magnificationAndDragGesture).rotationEffect(Angle(degrees: degrees)).scaleEffect(scale).animation(.easeInOut)
   }
 }

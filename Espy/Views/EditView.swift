@@ -73,7 +73,7 @@ struct EditView: View {
         Text(selectedEntry.createdAt.displayDate()).padding(5).font(.title3).foregroundColor(isNew ? .green : .primary)
         Spacer()
         EditModeButton()
-      }
+      }.padding()
 
       QuickTextEditor(text: $fullText, activeFont: $activeFont, placeholder: "# Untitled") { value in
         isTextUpdated = fullText != originalText
@@ -83,8 +83,8 @@ struct EditView: View {
       .cornerRadius(10)
       .padding(10)
 
-
       // Footer
+
       VStack {
         VStack(alignment: .center, spacing: 1) {
           Text(selectedEntry.id.uuidString).padding(0).font(.subheadline).foregroundColor(isNew ? .green : .gray)
@@ -113,7 +113,6 @@ struct EditView: View {
           ExportButton()
         }
       }
-
       .padding(20)
     })
     .onAppear(perform: {
