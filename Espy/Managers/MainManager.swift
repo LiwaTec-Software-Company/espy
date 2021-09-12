@@ -60,9 +60,8 @@ extension MainManager {
   func loadEntries(from files: [File]) -> [Entry] {
     var entries = [Entry]()
     for file in files {
-      entries.append(Entry(file: file))
+      entries.append(loadEntry(from: file))
     }
-    entryManager.add(entries)
     return entries
   }
 

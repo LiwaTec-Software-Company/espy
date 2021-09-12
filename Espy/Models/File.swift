@@ -33,7 +33,7 @@ struct File: Model {
       let createdAtTag = Tag(.createdAt, Date().formattedStringDate())
       let updatedAtTag = Tag(.updatedAt, Date().formattedStringDate())
 
-      defaultMap[.createdAt] = createdAtTag
+      defaultMap[.createdAt] = createdAtTag 
       defaultMap[.updatedAt] = updatedAtTag
       return defaultMap
     }
@@ -55,6 +55,12 @@ struct File: Model {
     self.updatedAt = updatedAt ?? self.createdAt
     self.contents = contents ?? "# \(self.createdAt.formattedStringDate()) "
     self.tagMap = tagMap ?? File.defaultTagMap
+    if let fileIdTag = tagMap![.id],
+      let uuid = UUID(uuidString: fileIdTag.value) {
+      self.id = uuid
+    } else {
+      self.tagMap[.id] = Tag(.id, self.id.uuidString)
+    }
   }
 
   init(name: String, contents: String?) {
@@ -70,6 +76,7 @@ struct File: Model {
   func formattedStringTags() -> String {
     var meta: String = "\(Meta.start)\n"
     for (name, tag) in tagMap {
+      let tag = tag
       meta += "\(Meta.indent)\(name.asAstring()) \(tag.value)\n"
     }
     meta += "\(Meta.end)\n"

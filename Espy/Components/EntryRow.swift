@@ -29,45 +29,43 @@ struct EntryRow: View {
   @State private var canBeDragged: Bool = true
 
   var body: some View {
-    // tap > dtap > long
-    let longTapGesture = LongPressGesture(minimumDuration: 0.5).onEnded { _ in
-      secondaryAction()
-    }
-    let doubleTapGesture = TapGesture(count: 2).onEnded { _ in
-      thirdAction()
-    }
     let tapGesture = TapGesture().onEnded { _ in
       action()
     }
-    let longAndTap = tapGesture.exclusively(before: longTapGesture)
-    let tapBeforeDoubleGesture = longAndTap.sequenced(before: doubleTapGesture)
 
     Button(action: {}) {
       HStack {
         VStack(alignment: .leading, spacing: 2) {
           HStack(alignment: .firstTextBaseline) {
             Text(entry.createdAt.shortString())
-              .font(.caption).foregroundColor(.accentColor)
-            Text("<")
+              .font(.headline).foregroundColor(.accentColor)
+            Text("<").font(.headline).foregroundColor(.accentColor)
             Text(entry.updatedAt.shortString())
-              .font(.caption).foregroundColor(.gray)
+              .font(.subheadline).foregroundColor(.gray)
           }
-          VStack(alignment: .leading) {
-            if contentManager.isEditModeOn {
-              Text(entry.contents).font(.callout)
-            } else {
-              let markdownLines: [MarkdownLine] = entry.formatted.components(separatedBy: .newlines).map { line in
-                return MarkdownLine(line: line)
-              }
+
+          if contentManager.isEditModeOn {
+            Text(entry.contents)
+              .font(.callout)
+              .foregroundColor(.gray)
+              .multilineTextAlignment(.leading)
+          } else {
+            let markdownLines: [MarkdownLine] = entry.formatted.components(separatedBy: .newlines).map { line in
+              return MarkdownLine(line: line)
+            }
+            VStack(alignment: .leading) {
               ForEach(markdownLines, id: \.self) { (markdownLine: MarkdownLine) in
-                markdownLine.multilineTextAlignment(.leading)
+                markdownLine
+                  .multilineTextAlignment(.leading)
               }
             }
-          }.padding()
+          }
         }
       }
-      .frame(maxWidth: .infinity, maxHeight: .infinity).padding().background(Color.black)
-      .gesture(tapBeforeDoubleGesture)
+      .frame(maxWidth: .infinity, maxHeight: .infinity)
+      .padding()
+      .background(Color.black)
+      .gesture(tapGesture)
     }
     .overlay(
       RoundedRectangle(cornerRadius: 10)
@@ -77,6 +75,5 @@ struct EntryRow: View {
       x: viewState.width + translation.width,
       y: viewState.height + translation.height
     )
-    //    .gesture(magnificationAndDragGesture).rotationEffect(Angle(degrees: degrees)).scaleEffect(scale).animation(.easeInOut)
   }
 }

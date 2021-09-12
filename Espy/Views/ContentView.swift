@@ -6,22 +6,18 @@
 //
 
 import SwiftUI
-import MarkdownUI
 
-
-
-
-
+@available(iOS 15.0, *)
 struct ContentView: View {
-  @ObservedObject private var mainManager: MainManager = MainManager.shared
-  @ObservedObject private var contentManager = MainManager.shared.contentManager
-  @ObservedObject private var entryManager = MainManager.shared.entryManager
-
+  @StateObject private var mainManager: MainManager = MainManager.shared
+  @StateObject private var contentManager = MainManager.shared.contentManager
+  @StateObject private var entryManager = MainManager.shared.entryManager
 
   @State private var isShowingEntrySheet = false
   @State private var isShowingBottomSheet = true
   @State private var isShowingDocSheet = false
   @State private var isShowingDocEntrySheet = false
+  
 
   @State private var currentEntry: Entry?
 
@@ -33,11 +29,11 @@ struct ContentView: View {
   @State var editViewFromDocSheet: EditView?
 
   init() {
-    let barBackgroundImage = UIImage(color: UIColor(hue: 0, saturation: 1, brightness: 0, alpha: 0.7))
-    UINavigationBar.appearance().barTintColor = .clear
-    UINavigationBar.appearance().setBackgroundImage(barBackgroundImage, for: .default)
-    UIToolbar.appearance().barTintColor = .clear
-    UIToolbar.appearance().setBackgroundImage(barBackgroundImage, forToolbarPosition: .any, barMetrics: .default)
+//    let barBackgroundImage = UIImage(color: UIColor(hue: 0, saturation: 1, brightness: 0, alpha: 0.7))
+//    UINavigationBar.appearance().barTintColor = .clear
+//    UINavigationBar.appearance().setBackgroundImage(barBackgroundImage, for: .default)
+//    UIToolbar.appearance().barTintColor = .clear
+//    UIToolbar.appearance().setBackgroundImage(barBackgroundImage, forToolbarPosition: .any, barMetrics: .default)
   }
 
   var body: some View {
@@ -69,7 +65,7 @@ struct ContentView: View {
         isShowingBottomSheet = true
       }
       .toolbar {
-        ToolbarItem(placement: .destructiveAction) {
+        ToolbarItem(placement: .navigationBarLeading) {
           TrashButton(onPress: {
             if contentManager.isMultiSelectOn {
               deleteAllSelectedEntries()
@@ -91,16 +87,14 @@ struct ContentView: View {
           })
         }
 
-        ToolbarItem(placement: .navigationBarLeading) {
+        ToolbarItem(placement: .navigationBarTrailing) {
           EditModeButton()
         }
 
         ToolbarItemGroup(placement: .bottomBar) {
-          Button(action: {
+          ImportButton(onPress: {
             isShowingDocSheet.toggle()
-          }) {
-            Image(systemName: "folder")
-          }.sheet(isPresented: $isShowingDocSheet, content: {
+          }).sheet(isPresented: $isShowingDocSheet, content: {
             DocumentPickerView { url in
               self.editViewFromDocSheet = EditView(url: url)
               isShowingDocEntrySheet.toggle()
@@ -132,11 +126,15 @@ struct ContentView: View {
             Text("")
           }
           Spacer()
-          Button(action: {
-            ExportView()
-          }) {
-            Image(systemName: contentManager.isMultipleSelected ? "arrowshape.turn.up.right.fill" : "arrowshape.turn.up.right.fill")
-          }
+          ExportButton()
+        }
+      }
+      VStack {
+        Button("press me to open something cool") {
+          isShowingDocSheet.toggle()
+        }
+        Button("press me to open something cool") {
+          isShowingDocSheet.toggle()
         }
       }
     }
@@ -173,6 +171,7 @@ struct ContentView: View {
   }
 }
 
+@available(iOS 15.0, *)
 struct ContentView_Previews: PreviewProvider {
   static var previews: some View {
     ContentView()
@@ -180,19 +179,4 @@ struct ContentView_Previews: PreviewProvider {
 }
 
 
-struct MarkdownLine: View, Identifiable, Hashable {
-  @State var line: String = ""
-  let id: UUID = UUID()
 
-  var body: some View {
-    Markdown("\(line)").disabled(true)
-  }
-
-  static func == (lhs: MarkdownLine, rhs: MarkdownLine) -> Bool {
-    return lhs.id == rhs.id && lhs.line == rhs.line
-  }
-
-  func hash(into hasher: inout Hasher) {
-    hasher.combine(id)
-  }
-}

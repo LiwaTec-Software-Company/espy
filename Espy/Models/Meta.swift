@@ -8,32 +8,24 @@
 import Foundation
 import UniformTypeIdentifiers
 
-protocol Tagable: Hashable {
-  var name: TagName { get set }
-  var value: String { get set }
-  init(_ name: TagName, _ value: String)
+class Tag: Identifiable {
+  var id: UUID = UUID()
+  var name: TagName
+  var value: String
+
+  init(_ name: TagName, _ value: String) {
+    self.name = name
+    self.value = value
+  }
 }
+
 
 struct Meta {
   static let start: String = ":SP"
   static let end: String = "::Y"
   static let regexString: String = ":SP\\n[^$]+\\n::Y"
   static let regex: NSRegularExpression = NSRegularExpression(Meta.regexString)
-  static let indent: String = "  "
-}
-
-struct Tag: Tagable {
-  var name: TagName
-  var value: String
-  init(_ name: TagName, _ value: String) {
-    self.name = name
-    self.value = value
-  }
-
-  init(_ name: String, _ value: String) {
-    self.name = TagName(name)
-    self.value = value
-  }
+  static let indent: String = ""
 }
 
 enum TagName: Hashable {
