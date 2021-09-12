@@ -96,13 +96,12 @@ struct EditView: View {
           })
           Spacer()
           Button(action: {
-            let entry = Entry(entry: selectedEntry, contents: fullText)
             if isNew {
-              mainManager.add(entry: entry)
+              self.selectedEntry.update(with: fullText)
+              mainManager.add(entry: selectedEntry)
             } else if isTextUpdated {
-              mainManager.update(entry: entry)
+              mainManager.update(entry: selectedEntry, with: fullText)
             }
-
             contentManager.unselect(selectedEntry)
             presentationMode.wrappedValue.dismiss()
           }, label: {

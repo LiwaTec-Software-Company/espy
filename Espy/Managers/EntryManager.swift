@@ -27,11 +27,9 @@ class EntryManager: ObservableObject  {
     return idMap[id]
   }
 
-  func update(_ entry: Entry, canCreateNew: Bool = true) {
-    if let oldEntry = idMap[entry.id] {
-      idMap[oldEntry.id] = entry
-    } else if canCreateNew {
-      add(entry)
+  func update(_ entry: Entry, with contents: String, canCreateNew: Bool = true) {
+    if let entry = idMap[entry.id] {
+      entry.contents = contents
     }
   }
 

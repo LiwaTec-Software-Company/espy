@@ -8,7 +8,7 @@
 import Foundation
 import UniformTypeIdentifiers
 
-class Tag: Identifiable {
+struct Tag: Identifiable {
   var id: UUID = UUID()
   var name: TagName
   var value: String

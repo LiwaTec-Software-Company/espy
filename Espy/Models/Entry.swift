@@ -9,7 +9,7 @@
 import Foundation
 import SwiftUI
 
-struct Entry: Model {
+class Entry: Model {
   typealias T = Entry
 
   var id: UUID = UUID()
@@ -67,7 +67,16 @@ struct Entry: Model {
     self.file = entry.file.withUpdated(contents: contents)
   }
 
-  mutating func set(file: File) {
+}
+
+extension Entry {
+  func update(with contents: String) {
+    self.contents = contents + file.formattedStringTags()
+    self.file = self.file.withUpdated(contents: contents)
+    self.updatedAt = Date()
+  }
+
+  func set(file: File) {
     self.file = file
   }
 

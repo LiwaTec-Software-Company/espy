@@ -74,7 +74,7 @@ struct File: Model {
   }
 
   func formattedStringTags() -> String {
-    var meta: String = "\(Meta.start)\n"
+    var meta: String = "\n\n\(Meta.start)\n"
     for (name, tag) in tagMap {
       let tag = tag
       meta += "\(Meta.indent)\(name.asAstring()) \(tag.value)\n"
