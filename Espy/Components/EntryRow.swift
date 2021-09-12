@@ -47,16 +47,17 @@ struct EntryRow: View {
         VStack(alignment: .leading, spacing: 2) {
           HStack(alignment: .firstTextBaseline) {
             Text(entry.createdAt.shortString())
-              .font(.caption).foregroundColor(.accentColor)
-            Text("<")
+              .font(.headline).foregroundColor(.accentColor)
+            Text("<").font(.headline).foregroundColor(.accentColor)
             Text(entry.updatedAt.shortString())
-              .font(.caption).foregroundColor(.gray)
+              .font(.subheadline).foregroundColor(.gray)
           }
 
           if contentManager.isEditModeOn {
             Text(entry.contents)
               .font(.callout)
               .multilineTextAlignment(.leading)
+              .foregroundColor(.gray)
           } else {
             let markdownLines: [MarkdownLine] = entry.formatted.components(separatedBy: .newlines).map { line in
               return MarkdownLine(line: line)
