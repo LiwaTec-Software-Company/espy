@@ -96,6 +96,6 @@ extension Entry {
   }
 
   func getContentsWithoutMeta() -> String {
-    return Meta.regex.replacingMatch(in: contents, with: "")
+    return Meta.regex.replacingMatch(in: contents, with: "").trimmingCharacters(in: .whitespacesAndNewlines)
   }
 }

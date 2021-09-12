@@ -12,6 +12,7 @@
 		3D19370426EC44D4009E61E5 /* ExportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D19370326EC44D4009E61E5 /* ExportView.swift */; };
 		3D19370626EC4D87009E61E5 /* MarkdownLine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D19370526EC4D87009E61E5 /* MarkdownLine.swift */; };
 		3D19370826ED2330009E61E5 /* QuickTextEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D19370726ED2330009E61E5 /* QuickTextEditor.swift */; };
+		3D19370A26EE8109009E61E5 /* String+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D19370926EE8109009E61E5 /* String+Extensions.swift */; };
 		3D1A477126E0723900583474 /* LocalManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D1A477026E0723900583474 /* LocalManager.swift */; };
 		3D1A477326E0724B00583474 /* EntryManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D1A477226E0724B00583474 /* EntryManager.swift */; };
 		3D1B862A26E5CEEF0066AD70 /* Meta.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D1B862926E5CEEF0066AD70 /* Meta.swift */; };
@@ -64,6 +65,7 @@
 		3D19370326EC44D4009E61E5 /* ExportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportView.swift; sourceTree = "<group>"; };
 		3D19370526EC4D87009E61E5 /* MarkdownLine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownLine.swift; sourceTree = "<group>"; };
 		3D19370726ED2330009E61E5 /* QuickTextEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickTextEditor.swift; sourceTree = "<group>"; };
+		3D19370926EE8109009E61E5 /* String+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Extensions.swift"; sourceTree = "<group>"; };
 		3D1A477026E0723900583474 /* LocalManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalManager.swift; sourceTree = "<group>"; };
 		3D1A477226E0724B00583474 /* EntryManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntryManager.swift; sourceTree = "<group>"; };
 		3D1B862926E5CEEF0066AD70 /* Meta.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Meta.swift; sourceTree = "<group>"; };
@@ -155,6 +157,7 @@
 				3D95EA2726E1C46700B72D86 /* View+Extensions.swift */,
 				3D95EA2926E2F10000B72D86 /* UIImage+Extensions.swift */,
 				3D5D72BB26E6C43600827FE6 /* NSRegularExpression+Extensions.swift */,
+				3D19370926EE8109009E61E5 /* String+Extensions.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -398,6 +401,7 @@
 				3D1B862A26E5CEEF0066AD70 /* Meta.swift in Sources */,
 				3D29477D26E04C010086CC65 /* EditView.swift in Sources */,
 				3DEE0CFE26E569C9002662C0 /* MainManager.swift in Sources */,
+				3D19370A26EE8109009E61E5 /* String+Extensions.swift in Sources */,
 				3D19370426EC44D4009E61E5 /* ExportView.swift in Sources */,
 				3D699A2C26DEE21F00E9755E /* ForEachWithIndex.swift in Sources */,
 				3DE853AD26DD714200D5E146 /* Date+Extensions.swift in Sources */,
