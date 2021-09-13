@@ -56,10 +56,12 @@ class MainViewModel: ObservableObject {
 
   func add(_ entry: Entry) {
     manager.add(entry: entry)
+    reloadEntryMap()
   }
 
   func update(_ entry: Entry, with contents: String) {
     manager.update(entry: entry, with: contents)
+    reloadEntryMap()
   }
 
   func isEntrySelected(_ entry: Entry) -> Bool {
@@ -94,9 +96,11 @@ class MainViewModel: ObservableObject {
 
   func delete(_ entry: Entry) {
     coordinator.delete(entry)
+    reloadEntryMap()
   }
 
   func delete(_ entries: [Entry]) {
     coordinator.delete(entries)
+    reloadEntryMap()
   }
 }

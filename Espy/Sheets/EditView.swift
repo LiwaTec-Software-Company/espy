@@ -10,110 +10,54 @@ import SwiftUI
 @available(iOS 15.0, *)
 struct EditView: View {
   @Environment(\.presentationMode) var presentationMode
-  @EnvironmentObject var viewModel: MainViewModel
-
-  @FocusState private var isEditingText: Bool
-  @State var fullText: String = "# "
-  @State var isTextUpdated: Bool = false
-  @State private var currentDate: Date = Date()
-
-  @State private var activeFont: UIFont = .systemFont(ofSize: 18, weight: .regular)
-  @State private var isAtBottom: Bool = false
-
-  private var originalText: String = ""
-
-  var selectedID: UUID {
-    get {
-      self.selectedEntry.id
-    }
-  }
-
-  var selectedEntry: Entry = Entry()
-
-  var isNew = true
-
-
-
-  init() {
-    isEditingText = isNew
-  }
-
-  init(_ entry: Entry, isNew: Bool = false) {
-    self.init()
-    self.selectedEntry = entry
-
-    self.isNew = isNew
-    _fullText = State(initialValue: selectedEntry.getContentsWithoutMeta())
-    originalText = self.fullText
-  }
-
-  init(url: URL) {
-    self.init(Manager.shared.getEntry(with: url))
-  }
-
-  init(id: UUID, isNew: Bool = false) {
-    if let entry = Manager.shared.getEntry(with: id) {
-      self.init(entry, isNew: isNew)
-    } else {
-      self.init()
-    }
-  }
+  @ObservedObject var viewModel: EditViewModel
 
   var body: some View {
     VStack(alignment: .center, spacing: 4.0, content: {
         // Header
       HStack {
         TrashButton(onPress: {
-          if (!isNew) {
-            viewModel.unselect(selectedEntry)
-            viewModel.delete(selectedEntry)
+          if (!viewModel.isNew) {
+            viewModel.delete(viewModel.selectedEntry)
             presentationMode.wrappedValue.dismiss()
           }
         })
         Spacer()
-        Text(selectedEntry.createdAt.displayDate()).padding(5).font(.title3).foregroundColor(isNew ? .green : .primary)
+        Text(viewModel.selectedEntry.createdAt.displayDate()).padding(5).font(.title3).foregroundColor(viewModel.isNew ? .green : .primary)
         Spacer()
         EditModeButton()
       }.padding()
 
       ZStack(alignment: .bottomLeading) {
-        QuickTextEditor(text: $fullText, activeFont: $activeFont, placeholder: "# Untitled") { value in
-          isTextUpdated = fullText != originalText
-          currentDate = Date()
+        QuickTextEditor(text: $viewModel.fullText, activeFont: $viewModel.activeFont, placeholder: "# Untitled") { value in
+          viewModel.onEditorChanged()
         } onScroll: { scrollView in
           DispatchQueue.main.async {
             if scrollView.contentOffset.y >= scrollView.contentSize.height - scrollView.frame.size.height {
-              self.isAtBottom = true
-              print(self.isAtBottom)
+              viewModel.isAtBottom = true
+              print(viewModel.isAtBottom)
             } else if scrollView.contentOffset.y <= scrollView.contentSize.height - scrollView.frame.size.height {
-              self.isAtBottom = false
+              viewModel.isAtBottom = false
             }
           }
         }
-        .focused($isEditingText)
         .cornerRadius(10)
         .padding(10)
           // Footer
         VStack(alignment: .center) {
-          Text(selectedEntry.id.uuidString).font(.subheadline).foregroundColor(isNew ? .green : .gray).lineLimit(1)
+          Text(viewModel.selectedEntry.id.uuidString).font(.subheadline).foregroundColor(viewModel.isNew ? .green : .gray).lineLimit(1)
           HStack(alignment: .center) {
             ImportButton(onPress: {
               print("eh")
             })
             VStack(alignment: .center, spacing: 1) {
-              Text(currentDate.formattedStringDate()).font(.caption).foregroundColor((isTextUpdated || isNew) ? .green : .gray)
+              Text(viewModel.currentDate.formattedStringDate()).font(.caption).foregroundColor((viewModel.isTextUpdated || viewModel.isNew) ? .green : .gray)
               Button(action: {
-                if isNew {
-                  self.selectedEntry.update(with: fullText)
-                  viewModel.add(selectedEntry)
-                } else if isTextUpdated {
-                  viewModel.update(selectedEntry, with: fullText)
-                }
-                viewModel.unselect(selectedEntry)
+                viewModel.save()
                 presentationMode.wrappedValue.dismiss()
               }, label: {
                 Image(systemName: "chevron.compact.down")
-                  .font(.system(size: 44.0, weight: .bold)).foregroundColor((isTextUpdated || isNew) ? .green : .accentColor)
+                  .font(.system(size: 44.0, weight: .bold)).foregroundColor((viewModel.isTextUpdated || viewModel.isNew) ? .green : .accentColor)
               })
               .padding(10)
             }
@@ -122,23 +66,21 @@ struct EditView: View {
           }
         }
         .padding(10)
-        .background(Color.black.opacity(isAtBottom ? 0 : 0.5))
+        .background(Color.black.opacity(viewModel.isAtBottom ? 0 : 0.5))
         .cornerRadius(10)
         .padding(10)
 
       }
     })
       .onAppear(perform: {
-        if (!isNew) {
-          viewModel.select(selectedEntry)
-        }
+     
       })
   }
 }
 
-@available(iOS 15.0, *)
-struct EditView_Previews: PreviewProvider {
-  static var previews: some View {
-    EditView()
-  }
-}
+//@available(iOS 15.0, *)
+//struct EditView_Previews: PreviewProvider {
+//  static var previews: some View {
+//    EditView()
+//  }
+//}

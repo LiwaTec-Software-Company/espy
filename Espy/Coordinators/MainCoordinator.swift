@@ -17,15 +17,12 @@ enum Sheet {
 class MainCoordinator: ObservableObject, Identifiable {
   @Published var section: Section = .main
   @Published var viewModel: MainViewModel!
-  @Published var editViewModel: EditView?
-//  @Published var editViewFromDocSheet: EditView?
+  @Published var editViewModel: EditViewModel?
 
   @Published var isShowingEntrySheet = false
   @Published var isShowingBottomSheet = true
   @Published var isShowingDocSheet = false
   @Published var isShowingDocEntrySheet = false
-
-  @Published var currentEntry: Entry?
 
   private let manager: Manager
   private unowned let parent: Coordinator
@@ -43,13 +40,22 @@ class MainCoordinator: ObservableObject, Identifiable {
   }
 
   func open(_ entry: Entry, isNew: Bool = false) {
-    self.editViewModel = EditView(entry, isNew: isNew)
-    self.currentEntry = entry
+    self.editViewModel = .init(entry: entry, coordinator: self, isNew: isNew)
   }
 
-  func add(_ entry: Entry, with contents: String) {
+  func open(url: URL) {
+    let entryFromURL = Manager.shared.getEntry(with: url)
+    self.editViewModel = .init(entry: entryFromURL, coordinator: self, isNew: false)
+  }
+
+  func add(_ entry: Entry) {
     viewModel.add(entry)
   }
+
+  func update(_ entry: Entry, with contents: String) {
+    viewModel.add(entry)
+  }
+
 
   func delete(_ entry: Entry) {
     viewModel.delete(entry)
@@ -61,7 +67,7 @@ class MainCoordinator: ObservableObject, Identifiable {
 
   func unselectAllRows() {
     viewModel.unselectAll()
-    currentEntry = nil
+    editViewModel = nil
   }
 }
 
@@ -70,13 +76,12 @@ struct MainCoordinatorView: View {
 
   var body: some View {
     MainView(viewModel: coordinator.viewModel)
-      .sheet(item: $coordinator.currentEntry, content: { entry in
-        EditView(entry).onDisappear(perform: coordinator.unselectAllRows)
+      .sheet(item: $coordinator.editViewModel, content: { editViewModel in
+        EditView(viewModel: editViewModel).onDisappear(perform: coordinator.unselectAllRows)
       })
       .sheet(isPresented: $coordinator.isShowingDocSheet, content: {
         DocumentPickerView { url in
-          coordinator.editViewModel = EditView(url: url)
-          coordinator.isShowingDocEntrySheet.toggle()
+          coordinator.open(url: url)
         }.onDisappear {
           coordinator.loadAll()
         }

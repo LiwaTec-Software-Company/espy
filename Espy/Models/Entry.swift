@@ -76,6 +76,11 @@ extension Entry {
     self.updatedAt = Date()
   }
 
+  func updated(with contents: String) -> Entry {
+    self.update(with: contents)
+    return self
+  }
+
   func update(with file: File) {
     self.contents = file.contents
     set(file: file)
