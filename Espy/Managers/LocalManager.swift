@@ -113,13 +113,13 @@ class LocalManager: ObservableObject  {
     return fileManager.fileExists(atPath: filePath)
   }
 
-  func update(_ file: File, canCreateNew: Bool = true) {
+  func update(_ file: File, with contents: String, canCreateNew: Bool = true) {
     if doesFileExist(file.url) {
       delete(file: file)
-      let _ = create(file: file, write: file.contents)
+      let _ = create(file: file, write: contents)
     }
     if canCreateNew {
-      let _ = create(file: file, write: file.contents)
+      let _ = create(file: file, write: contents)
     }
   }
 

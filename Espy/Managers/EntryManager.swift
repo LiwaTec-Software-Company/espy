@@ -7,8 +7,6 @@
 
 import Foundation
 
-
-
 class EntryManager: ObservableObject  {
   static let shared = EntryManager()
   @Published var idMap = [UUID: Entry]()
@@ -28,9 +26,8 @@ class EntryManager: ObservableObject  {
   }
 
   func update(_ entry: Entry, with contents: String, canCreateNew: Bool = true) {
-    if let entry = idMap[entry.id] {
-      entry.contents = contents
-    }
+    guard idMap[entry.id] != nil else { return }
+    idMap[entry.id]!.update(with: contents)
   }
 
   /// Removes given entry from the idMap

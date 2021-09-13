@@ -53,9 +53,8 @@ class MainCoordinator: ObservableObject, Identifiable {
   }
 
   func update(_ entry: Entry, with contents: String) {
-    viewModel.add(entry)
+    viewModel.update(entry, with: contents)
   }
-
 
   func delete(_ entry: Entry) {
     viewModel.delete(entry)

@@ -69,12 +69,8 @@ struct EditView: View {
         .background(Color.black.opacity(viewModel.isAtBottom ? 0 : 0.5))
         .cornerRadius(10)
         .padding(10)
-
       }
     })
-      .onAppear(perform: {
-     
-      })
   }
 }
 

@@ -23,13 +23,12 @@ class EditViewModel: ObservableObject, Identifiable {
   @FocusState  var isEditingText: Bool
 
   private var originalText: String = ""
-
-  var selectedID: UUID {
+  private var selectedID: UUID {
     get {
       self.selectedEntry.id
     }
   }
-
+  
   private unowned let coordinator: MainCoordinator
 
   init(entry: Entry, coordinator: MainCoordinator, isNew: Bool = false) {

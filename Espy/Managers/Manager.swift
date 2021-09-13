@@ -111,11 +111,10 @@ extension Manager {
     return entries
   }
 
-
   // UPDATE
   func update(entry: Entry, with contents: String) {
     entryManager.update(entry, with: contents)
-    localManager.update(entry.file)
+    localManager.update(entry.file, with: contents)
   }
 
   func delete(entry: Entry) {
