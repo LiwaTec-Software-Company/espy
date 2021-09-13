@@ -13,7 +13,7 @@ struct ButtonStyle {
 }
 
 struct TrashButton: View {
-  @EnvironmentObject var contentManager: ContentManager
+  @EnvironmentObject var viewModel: MainViewModel
 
   var onPress: () -> Void
 
@@ -22,24 +22,24 @@ struct TrashButton: View {
       Button(action: {
         onPress()
       }, label: {
-        Image(systemName: contentManager.isAnythingSelected ? "trash.fill": "trash")
-          .font(Font.system(size: (contentManager.isAnythingSelected || contentManager.isMultiSelectOn) ? ButtonStyle.normalFontSize : ButtonStyle.disabledFontSize))
-          .foregroundColor(contentManager.isAnythingSelected ? .red : .gray)
+        Image(systemName: viewModel.isAnythingSelected ? "trash.fill": "trash")
+          .font(Font.system(size: (viewModel.isAnythingSelected || viewModel.isMultiSelectOn) ? ButtonStyle.normalFontSize : ButtonStyle.disabledFontSize))
+          .foregroundColor(viewModel.isAnythingSelected ? .red : .gray)
         Text("")
-      }).disabled(!(contentManager.isMultiSelectOn || contentManager.isAnythingSelected))
+      }).disabled(!(viewModel.isMultiSelectOn || viewModel.isAnythingSelected))
     }
   }
 }
 
 struct EditModeButton: View {
-  @EnvironmentObject var contentManager: ContentManager
+  @EnvironmentObject var viewModel: MainViewModel
 
   var body: some View {
     HStack{
       Button(action: {
-        contentManager.isEditModeOn.toggle()
+        viewModel.isEditModeOn.toggle()
       }, label: {
-        Image(systemName: contentManager.isEditModeOn ? "doc.richtext" : "doc.richtext.fill")
+        Image(systemName: viewModel.isEditModeOn ? "doc.richtext" : "doc.richtext.fill")
           .font(Font.system(size: ButtonStyle.normalFontSize))
           .foregroundColor(.accentColor)
         Text("")
@@ -49,7 +49,7 @@ struct EditModeButton: View {
 }
 
 struct BlockModeButton: View {
-  @EnvironmentObject var contentManager: ContentManager
+  @EnvironmentObject var viewModel: MainViewModel
 
   var onPress: () -> Void
 
@@ -58,7 +58,7 @@ struct BlockModeButton: View {
       Button(action: {
         onPress()
       }, label: {
-        Image(systemName: (contentManager.isEverythingSelected && contentManager.isMultiSelectOn) ? "xmark.circle.fill" : contentManager.isMultiSelectOn ? "rectangle.grid.1x2.fill" : "rectangle.grid.1x2")
+        Image(systemName: (viewModel.isEverythingSelected && viewModel.isMultiSelectOn) ? "xmark.circle.fill" : viewModel.isMultiSelectOn ? "rectangle.grid.1x2.fill" : "rectangle.grid.1x2")
           .font(Font.system(size: ButtonStyle.normalFontSize))
           .foregroundColor(.accentColor)
         Text("")
@@ -68,24 +68,24 @@ struct BlockModeButton: View {
 }
 
 struct ExportButton: View {
-  @EnvironmentObject var contentManager: ContentManager
+  @EnvironmentObject var viewModel: MainViewModel
 
   var body: some View {
     NavigationLink(destination: ExportView()) {
-      Image(systemName: contentManager.isMultipleSelected ? "rectangle.portrait.and.arrow.right.fill" : "rectangle.portrait.and.arrow.right")
+      Image(systemName: viewModel.isMultipleSelected ? "rectangle.portrait.and.arrow.right.fill" : "rectangle.portrait.and.arrow.right")
     }
   }
 }
 
 struct ImportButton: View {
-  @EnvironmentObject var contentManager: ContentManager
+  @EnvironmentObject var viewModel: MainViewModel
   var onPress: () -> Void
 
   var body: some View {
     Button(action: {
       onPress()
     }, label: {
-      Image(systemName: contentManager.isMultipleSelected ? "square.and.arrow.down.on.square.fill" : contentManager.isAnythingSelected ? "square.and.arrow.down.fill" : "folder.badge.gearshape")
+      Image(systemName: viewModel.isMultipleSelected ? "square.and.arrow.down.on.square.fill" : viewModel.isAnythingSelected ? "square.and.arrow.down.fill" : "folder.badge.gearshape")
     })
   }
 }

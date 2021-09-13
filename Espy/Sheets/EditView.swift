@@ -10,9 +10,7 @@ import SwiftUI
 @available(iOS 15.0, *)
 struct EditView: View {
   @Environment(\.presentationMode) var presentationMode
-  @EnvironmentObject var mainManager: MainManager
-  @EnvironmentObject var contentManager: ContentManager
-  @EnvironmentObject var entryManger: EntryManager
+  @EnvironmentObject var viewModel: MainViewModel
 
   @FocusState private var isEditingText: Bool
   @State var fullText: String = "# "
@@ -20,6 +18,7 @@ struct EditView: View {
   @State private var currentDate: Date = Date()
 
   @State private var activeFont: UIFont = .systemFont(ofSize: 18, weight: .regular)
+  @State private var isAtBottom: Bool = false
 
   private var originalText: String = ""
 
@@ -32,6 +31,8 @@ struct EditView: View {
   var selectedEntry: Entry = Entry()
 
   var isNew = true
+
+
 
   init() {
     isEditingText = isNew
@@ -47,11 +48,11 @@ struct EditView: View {
   }
 
   init(url: URL) {
-    self.init(MainManager.shared.getEntry(with: url))
+    self.init(Manager.shared.getEntry(with: url))
   }
 
   init(id: UUID, isNew: Bool = false) {
-    if let entry = MainManager.shared.getEntry(with: id) {
+    if let entry = Manager.shared.getEntry(with: id) {
       self.init(entry, isNew: isNew)
     } else {
       self.init()
@@ -64,8 +65,8 @@ struct EditView: View {
       HStack {
         TrashButton(onPress: {
           if (!isNew) {
-            contentManager.unselect(selectedEntry)
-            mainManager.delete(entry: selectedEntry)
+            viewModel.unselect(selectedEntry)
+            viewModel.delete(selectedEntry)
             presentationMode.wrappedValue.dismiss()
           }
         })
@@ -79,6 +80,15 @@ struct EditView: View {
         QuickTextEditor(text: $fullText, activeFont: $activeFont, placeholder: "# Untitled") { value in
           isTextUpdated = fullText != originalText
           currentDate = Date()
+        } onScroll: { scrollView in
+          DispatchQueue.main.async {
+            if scrollView.contentOffset.y >= scrollView.contentSize.height - scrollView.frame.size.height {
+              self.isAtBottom = true
+              print(self.isAtBottom)
+            } else if scrollView.contentOffset.y <= scrollView.contentSize.height - scrollView.frame.size.height {
+              self.isAtBottom = false
+            }
+          }
         }
         .focused($isEditingText)
         .cornerRadius(10)
@@ -86,7 +96,7 @@ struct EditView: View {
           // Footer
         VStack(alignment: .center) {
           Text(selectedEntry.id.uuidString).font(.subheadline).foregroundColor(isNew ? .green : .gray).lineLimit(1)
-          HStack {
+          HStack(alignment: .center) {
             ImportButton(onPress: {
               print("eh")
             })
@@ -95,25 +105,24 @@ struct EditView: View {
               Button(action: {
                 if isNew {
                   self.selectedEntry.update(with: fullText)
-                  mainManager.add(entry: selectedEntry)
+                  viewModel.add(selectedEntry)
                 } else if isTextUpdated {
-                  mainManager.update(entry: selectedEntry, with: fullText)
+                  viewModel.update(selectedEntry, with: fullText)
                 }
-                contentManager.unselect(selectedEntry)
+                viewModel.unselect(selectedEntry)
                 presentationMode.wrappedValue.dismiss()
               }, label: {
                 Image(systemName: "chevron.compact.down")
                   .font(.system(size: 44.0, weight: .bold)).foregroundColor((isTextUpdated || isNew) ? .green : .accentColor)
               })
-                .padding(10)
+              .padding(10)
             }
             .frame(maxWidth: .infinity)
-
             ExportButton()
           }
         }
         .padding(10)
-        .background(Color.black.opacity(0.5))
+        .background(Color.black.opacity(isAtBottom ? 0 : 0.5))
         .cornerRadius(10)
         .padding(10)
 
@@ -121,7 +130,7 @@ struct EditView: View {
     })
       .onAppear(perform: {
         if (!isNew) {
-          contentManager.select(selectedEntry)
+          viewModel.select(selectedEntry)
         }
       })
   }

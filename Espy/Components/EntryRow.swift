@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 
 struct EntryRow: View {
-  @EnvironmentObject var contentManager: ContentManager
+  @EnvironmentObject var viewModel: MainViewModel
 
   var entry: Entry
   var action: () -> Void
@@ -18,22 +18,12 @@ struct EntryRow: View {
 
   var isSelected: Bool {
     get {
-      contentManager.isEntrySelected(entry)
+      viewModel.isEntrySelected(entry)
     }
   }
 
-  @State private var degrees: Double = 0
-  @State private var scale: CGFloat = 1.0
-  @State private var viewState = CGSize.zero
-  @State private var translation: CGSize = .zero
-  @State private var canBeDragged: Bool = false
-
   var body: some View {
-    let tapGesture = TapGesture().onEnded { _ in
-      action()
-    }
-
-    Button(action: {}) {
+    Button(action: action) {
       HStack {
         VStack(alignment: .leading, spacing: 2) {
           HStack(alignment: .firstTextBaseline) {
@@ -44,7 +34,7 @@ struct EntryRow: View {
               .font(.subheadline).foregroundColor(.gray)
           }
 
-          if contentManager.isEditModeOn {
+          if viewModel.isEditModeOn {
             Text(entry.contents)
               .font(.callout)
               .foregroundColor(.gray)
@@ -65,16 +55,10 @@ struct EntryRow: View {
       .frame(maxWidth: .infinity, maxHeight: .infinity)
       .padding()
       .background(Color.black)
-      .gesture(tapGesture)
     }
     .overlay(
       RoundedRectangle(cornerRadius: 10)
-        .stroke(isSelected ? Color.accentColor : Color.gray, lineWidth: isSelected ? 4 : contentManager.isMultiSelectOn ? 1 : 0)
-
-    )
-    .offset(
-      x: viewState.width + translation.width,
-      y: viewState.height + translation.height
+        .stroke(isSelected ? Color.accentColor : Color.gray, lineWidth: isSelected ? 4 : viewModel.isMultiSelectOn ? 1 : 0)
     )
   }
 }

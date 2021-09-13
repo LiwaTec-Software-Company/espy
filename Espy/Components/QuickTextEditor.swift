@@ -10,13 +10,6 @@ import MarkdownUI
 
 /// First responder text field UIViewRepresentable.
 struct QuickTextEditor: UIViewRepresentable {
-  @Binding var text: String
-  @Binding var activeFont: UIFont
-
-  let placeholder: String?
-  let onChange: (String) -> Void
-
-
   class Coordinator: NSObject, UITextViewDelegate {
     @Binding var text: String
     @Binding var activeFont: UIFont
@@ -26,6 +19,10 @@ struct QuickTextEditor: UIViewRepresentable {
     let textViewOnChange: (String) -> Void
 
     var activeTextView: UITextView!
+
+    var isAtBottom: Bool = false
+
+    var textViewDidScroll: (UIScrollView) -> Void
 
     private var hasPlaceholderText: Bool {
       get {
@@ -39,14 +36,14 @@ struct QuickTextEditor: UIViewRepresentable {
       }
     }
 
-    init(text: Binding<String>, activeFont: Binding<UIFont>, placeholder: String?, textViewOnChange: @escaping (String) -> Void) {
+    init(text: Binding<String>, activeFont: Binding<UIFont>, placeholder: String?, textViewOnChange: @escaping (String) -> Void, textViewDidScroll: @escaping (UIScrollView) -> Void) {
       self._text = text
       self._activeFont = activeFont
       self.placeholder = placeholder
       self.textViewOnChange = textViewOnChange
+      self.textViewDidScroll = textViewDidScroll
     }
 
-    
     func textViewDidChange(_ textView: UITextView) {
       text = textView.text ?? placeholder ?? ""
       textViewOnChange(text)
@@ -66,7 +63,11 @@ struct QuickTextEditor: UIViewRepresentable {
         textView.textColor = UIColor.systemGray
       }
     }
-    
+
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+      textViewDidScroll(scrollView)
+    }
+
     func setActive(textView: UITextView) {
       activeTextView = textView
     }
@@ -77,8 +78,15 @@ struct QuickTextEditor: UIViewRepresentable {
 
   }
 
+  @Binding var text: String
+  @Binding var activeFont: UIFont
+
+  let placeholder: String?
+  let onChange: (String) -> Void
+  let onScroll: (UIScrollView) -> Void
+
   func makeCoordinator() -> Coordinator {
-    return Coordinator(text: $text, activeFont: $activeFont, placeholder: placeholder, textViewOnChange: onChange)
+    return Coordinator(text: $text, activeFont: $activeFont, placeholder: placeholder, textViewOnChange: onChange, textViewDidScroll: onScroll)
   }
 
   func makeUIView(context: Context) -> some UIView {
