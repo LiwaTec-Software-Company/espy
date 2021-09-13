@@ -16,7 +16,6 @@ struct MainView: View {
         VStack {
           ForEach(viewModel.entryMap.sorted(by: {$0.value > $1.value}), id: \.key) { id, entry in
             EntryRow(entry: entry, action: {
-              selectRow(with: entry)
               if !viewModel.isMultiSelectOn {
                 viewModel.open(entry)
               }
@@ -45,14 +44,7 @@ struct MainView: View {
 
         ToolbarItem(placement: .principal) {
           BlockModeButton(onPress: {
-            if viewModel.isEverythingSelected && viewModel.isMultiSelectOn {
-              viewModel.isMultiSelectOn.toggle()
-              viewModel.unselectAll()
-            } else if viewModel.isMultiSelectOn {
-              viewModel.selectAll()
-            } else {
-              viewModel.isMultiSelectOn.toggle()
-            }
+            viewModel.toggleBlockMode()
           })
         }
 
@@ -98,11 +90,7 @@ struct MainView: View {
   }
 
   func deleteAllSelectedEntries() {
-   viewModel.delete(viewModel.selectionStack)
-  }
-
-  func selectRow(with entry: Entry) {
-    viewModel.toggleSelect(entry)
+    viewModel.deleteAllSelected()
   }
 
   func selectAllRows() {
@@ -110,7 +98,7 @@ struct MainView: View {
   }
 
   func unselectAllRows() {
-    viewModel.selectionStack.removeAll()
+    viewModel.selectionMap.removeAll()
   }
 }
 

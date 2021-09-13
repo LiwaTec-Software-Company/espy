@@ -9,26 +9,26 @@ import Foundation
 
 class MainViewModel: ObservableObject {
   @Published var entryMap = [UUID: Entry]()
-  @Published var selectionStack = [Entry]()
+  @Published var selectionMap = [UUID: Entry]()
 
   @Published var isMultiSelectOn: Bool = false
   @Published var isEditModeOn: Bool = false
 
   var isAnythingSelected: Bool {
     get {
-      selectionStack.count > 0
+      selectionMap.count > 0
     }
   }
 
   var isMultipleSelected: Bool {
     get {
-      selectionStack.count > 1
+      selectionMap.count > 1
     }
   }
 
   var isEverythingSelected: Bool {
     get {
-      selectionStack.count == entryMap.count
+      selectionMap.count == entryMap.count
     }
   }
 
@@ -42,8 +42,8 @@ class MainViewModel: ObservableObject {
   }
 
   func open(_ entry: Entry, isNew: Bool = false) {
-    self.coordinator.open(entry, isNew: isNew)
     select(entry)
+    self.coordinator.open(entry, isNew: isNew)
   }
 
   func openDocSheet() {
@@ -51,7 +51,7 @@ class MainViewModel: ObservableObject {
   }
 
   func select(_ entry: Entry) {
-    selectionStack.append(entry)
+    selectionMap[entry.id] = entry
   }
 
   func add(_ entry: Entry) {
@@ -65,7 +65,7 @@ class MainViewModel: ObservableObject {
   }
 
   func isEntrySelected(_ entry: Entry) -> Bool {
-    return selectionStack.contains(entry)
+    return selectionMap[entry.id] != nil
   }
 
   func toggleSelect(_ entry: Entry) {
@@ -75,18 +75,29 @@ class MainViewModel: ObservableObject {
       select(entry)
     }
   }
+
+  func toggleBlockMode() {
+    if isEverythingSelected && isMultiSelectOn {
+      isMultiSelectOn.toggle()
+      unselectAll()
+    } else if isMultiSelectOn {
+      selectAll()
+    } else {
+      isMultiSelectOn.toggle()
+    }
+  }
   
   func selectAll() {
-    selectionStack = Array(entryMap.values)
+    selectionMap = entryMap
   }
 
   func unselectAll() {
-    selectionStack.removeAll()
+    selectionMap.removeAll()
   }
 
   func unselect(_ entry: Entry) {
-    selectionStack.removeAll { selectedEntry in
-      entry == selectedEntry
+    if let index = selectionMap.index(forKey: entry.id) {
+      selectionMap.remove(at: index)
     }
   }
 
@@ -94,8 +105,13 @@ class MainViewModel: ObservableObject {
     self.entryMap = manager.getEntryMap()
   }
 
+  func deleteAllSelected() {
+    manager.delete(entries: Array(selectionMap.values))
+    reloadEntryMap()
+  }
+
   func delete(_ entry: Entry) {
-    coordinator.delete(entry)
+    manager.delete(entry: entry)
     reloadEntryMap()
   }
 

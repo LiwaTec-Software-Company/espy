@@ -32,10 +32,11 @@ class EditViewModel: ObservableObject, Identifiable {
 
   private unowned let coordinator: MainCoordinator
 
-  init(entry: Entry = Entry(), coordinator: MainCoordinator, isNew: Bool = false) {
+  init(entry: Entry, coordinator: MainCoordinator, isNew: Bool = false) {
     self.selectedEntry = entry
     self.coordinator = coordinator
     self.isNew = isNew
+    self.fullText = entry.getContentsWithoutMeta()
   }
 
   func save() {
@@ -44,7 +45,6 @@ class EditViewModel: ObservableObject, Identifiable {
     } else {
      coordinator.update(selectedEntry, with: fullText)
     }
-//    coordinator.unselectAllRows()
   }
 
   func delete(_ entry: Entry) {
